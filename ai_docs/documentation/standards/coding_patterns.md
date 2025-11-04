@@ -1,253 +1,18 @@
-{
-    "mcpServers": {
-      "supabase": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@supabase/mcp-server-supabase@latest",
-          "--access-token",
-          "sbp_9db243e8c95cfa9e62e8146aea61ebb0775d47e0"
-        ]
-      }
-    }
-  }
-
 # Coding Patterns & Rules
 
-This document defines the implementation patterns for this SaaS template. These patterns work with the fixed technology decisions defined in [`development-decisions.md`](./development-decisions.md).
+This document defines code style and structure patterns. For system architecture, data schema, and integration patterns, see `/architecture` folder.
+
+**Architecture References:**
+- System design, layers, data flow → `/architecture/system-architecture.md`
+- Database schema, tables, RLS → `/architecture/data-schema.sql`
+- API contracts, AI integration, file uploads → `/architecture/integration-contracts.md`
 
 ## 📋 Table of Contents
 
-1. [🏗️ Database Access Pattern (Repository)](#️-database-access-pattern-repository)
-2. [🗄️ Database Migration Pattern](#️-database-migration-pattern)
-3. [🔒 Authentication Pattern](#-authentication-pattern)
-4. [🚀 API Route Pattern](#-api-route-pattern)
-5. [📁 File Storage Pattern](#-file-storage-pattern)
-6. [🎨 Design System Pattern](#-design-system-pattern)
-7. [🎨 Component Pattern](#-component-pattern)
-8. [🚫 Prohibited Patterns](#-prohibited-patterns)
-9. [✅ Code Review Checklist](#-code-review-checklist)
-
----
-
-## 🏗️ Database Access Pattern (Pure Function Repositories)
-
-### ✅ REQUIRED: Use Pure Function Pattern Only
-
-**Clear separation between server and client usage.** Use pure functions with dependency injection.
-
-#### Structure:
-```
-libs/repositories/
-├── index.ts                   # Export all functions
-├── auth.ts                    # Authentication functions  
-├── profile.ts                 # User profile functions
-└── [entity].ts                # Additional entity functions
-```
-
-#### Server-Side Implementation:
-```typescript
-// ✅ CORRECT - Server usage (API routes, Server Components)
-import { createClient } from '@/libs/supabase/server'
-import { getUser, signOut } from '@/libs/repositories/auth'
-
-const supabase = createClient()
-const user = await getUser(supabase)
-await signOut(supabase)
-```
-
-#### Client-Side Implementation:
-```typescript
-// ✅ CORRECT - Client usage (Client Components)
-import { createClient } from '@/libs/supabase/client'
-
-const supabase = createClient()
-const { data: { user } } = await supabase.auth.getUser()
-await supabase.auth.signOut()
-```
-
-#### Pure Function Example:
-```typescript
-export async function getUser(supabase: SupabaseClient): Promise<User | null> {
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error) throw error
-  return user
-}
-```
-
----
-
-## 🗄️ Database Migration Pattern
-
-### ✅ REQUIRED: Two-Step Migration Process
-
-**CRITICAL**: During phase development, migrations are created as files ONLY. They are NOT applied to the database until explicit user permission.
-
-#### Migration Workflow:
-1. **Phase Development**: Create migration SQL files only
-2. **User Review**: User reviews all migration files
-3. **Explicit Permission**: User gives permission to apply migrations
-4. **Database Application**: Use MCP tools to apply migrations
-
-#### File Structure:
-```
-migrations/
-├── phase1/
-│   ├── 001_create_users_table.sql
-│   ├── 002_create_profiles_table.sql
-│   └── 003_add_indexes.sql
-├── phase2/
-│   ├── 004_create_content_tables.sql
-│   └── 005_add_relationships.sql
-└── phase3/
-    └── 006_create_analytics_tables.sql
-```
-
-#### During Phase Development:
-```typescript
-// ✅ CORRECT - Create migration file only
-// File: migrations/phase1/001_create_users_table.sql
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-// ❌ NEVER DO THIS - Apply migration directly during development
-await mcp__supabase__apply_migration({
-  project_id: 'swingo',
-  name: 'create_users_table',
-  query: '...'
-})
-```
-
-#### After User Permission:
-```typescript
-// ✅ CORRECT - Apply migrations only after explicit permission
-// User: "Apply the phase 1 migrations"
-// Assistant: Now applying the approved migrations...
-await mcp__supabase__apply_migration({
-  project_id: 'swingo',
-  name: 'phase1_migrations',
-  query: migrationContent
-})
-```
-
-#### Important Rules:
-- **NEVER** apply migrations automatically during phase development
-- **ALWAYS** create migration files in organized phase folders
-- **ALWAYS** wait for explicit user permission before applying
-- **NEVER** modify the database schema without user approval
-- Each migration file should be atomic and reversible when possible
-
-#### Benefits:
-- Enables autonomous code development without database dependencies
-- Allows user to review all database changes before application
-- Prevents accidental database modifications
-- Maintains clear separation between development and deployment
-
----
-
-## 🔒 Authentication Pattern
-
-**Fixed Decision**: Google OAuth only (per `development-decisions.md`)
-
-### Usage Patterns:
-```typescript
-// Server Component
-const user = await authRepository.getUser()
-if (!user) redirect('/signin')
-
-// Client Component  
-useEffect(() => {
-  authRepository.getUser().then(setUser)
-}, [])
-
-// API Route
-export const POST = withAuth(async (req, { user }) => {
-  // user is guaranteed authenticated
-})
-```
-
----
-
-## 🚀 API Route Pattern
-
-### ✅ REQUIRED: Use API Utilities Only
-
-**Never write raw API routes.** Always use standardized wrappers.
-
-#### Structure:
-```
-libs/api-utils/
-├── index.ts          # Export all utilities
-├── responses.ts      # Standardized responses
-├── errors.ts         # Error handling
-├── helpers.ts        # Common helpers
-└── middleware.ts     # Auth wrappers
-```
-
-#### Usage Patterns:
-```typescript
-// Public Route
-import { withApiHandler, apiSuccess } from '@/libs/api-utils'
-export const POST = withApiHandler(async (req) => {
-  return apiSuccess(data, "Success message")
-})
-
-// Protected Route
-import { withAuth } from '@/libs/api-utils'
-export const POST = withAuth(async (req, { user }) => {
-  return apiSuccess(data)
-})
-```
-
-#### Standardized Response:
-```typescript
-type ApiResponse<T> = {
-  success: boolean
-  data?: T
-  error?: string
-  message?: string
-}
-```
-
----
-
-## 📁 File Storage Pattern
-
-### ✅ REQUIRED: Use Storage Repository Only
-
-**Never handle uploads directly.** Always use storage repository.
-
-#### Structure:
-```
-libs/storage/
-├── index.ts              # Export utilities
-├── storageRepository.ts  # Main operations
-├── types.ts             # Upload types
-├── validation.ts        # File validation
-└── config.ts            # Configuration
-```
-
-#### Usage:
-```typescript
-// API Route
-import { withAuth } from '@/libs/api-utils'
-import { storageRepository, validateFile } from '@/libs/storage'
-
-export const POST = withAuth(async (req, { user }) => {
-  const formData = await req.formData()
-  const file = formData.get('file') as File
-  
-  validateFile(file)
-  const result = await storageRepository.uploadFile(path, file)
-  return apiSuccess(result)
-})
-
-// Frontend Hook
-const { upload, loading, error } = useFileUpload()
-```
+1. [🎨 Design System Pattern](#-design-system-pattern)
+2. [🎨 Component Pattern](#-component-pattern)
+3. [🚫 Prohibited Patterns](#-prohibited-patterns)
+4. [✅ Code Review Checklist](#-code-review-checklist)
 
 ---
 
@@ -409,37 +174,31 @@ import { Spinner } from 'antd'
 
 **Before committing, verify:**
 
-### Database & Repositories:
-- [ ] No direct Supabase imports in components/pages
-- [ ] All database operations use repositories
-- [ ] Repository extends `BaseRepository`
-- [ ] Components contain only UI logic
-- [ ] Migration files created but NOT applied during development
-- [ ] Migrations only applied after explicit user permission
+### Architecture Compliance:
+- [ ] Read `/architecture/system-architecture.md` for this phase
+- [ ] Followed data schema in `/architecture/data-schema.sql`
+- [ ] Followed API/AI contracts in `/architecture/integration-contracts.md`
+- [ ] No architectural deviations without user approval
 
-### API Routes:
-- [ ] All routes use `withApiHandler` or `withAuth`
-- [ ] Standardized response format (`apiSuccess`/`apiError`)
-- [ ] Input validation using helper functions
-
-### File Storage:
-- [ ] File uploads use storage repository
-- [ ] File validation applied before upload
-- [ ] Proper error handling for uploads
-
-### Components:
-- [ ] Uses only Tailwind + shadcn/ui
+### Code Style:
+- [ ] Uses only Tailwind + shadcn/ui (no other UI libraries)
 - [ ] All spacing/colors use CSS variables (design tokens)
-- [ ] Repository pattern for data access
 - [ ] Proper TypeScript interfaces
-- [ ] Consistent naming conventions
+- [ ] Consistent naming conventions (PascalCase components, camelCase functions)
 
-### Technology Compliance:
-- [ ] Follows all decisions in `development-decisions.md`
-- [ ] No forbidden technologies or patterns
-- [ ] Authentication uses Google OAuth only
-- [ ] No testing or CI/CD code added
+### Prohibited Patterns:
+- [ ] No class-based repositories
+- [ ] No auto-detection patterns (typeof window checks)
+- [ ] No raw API routes (always use wrappers)
+- [ ] No hard-coded design values
+- [ ] No non-standard UI frameworks
+
+### Best Practices:
+- [ ] Components contain only UI logic (business logic in `/libs`)
+- [ ] Server Components for data fetching, Client Components for interactivity
+- [ ] No unnecessary complexity (keep MVP simple)
+- [ ] Clear, concise code (avoid over-engineering)
 
 ---
 
-**Remember**: These patterns ensure consistent, maintainable code across all SaaS projects built with this template. Follow `development-decisions.md` for WHAT to use, and this file for HOW to implement it.
+**Remember**: Read architecture files before each phase. Keep code lean, functional, and aligned with system design.
