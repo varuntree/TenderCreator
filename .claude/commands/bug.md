@@ -15,14 +15,14 @@ Create a new plan in specs/*.md to resolve the `Bug` using the exact specified m
 - Don't use decorators. Keep it simple.
 - If you need a new library, use `uv add` and be sure to report it in the `Notes` section of the `Plan Format`.
 - Respect requested files in the `Relevant Files` section.
-- Start your research by reading the `README.md` file.
+- Start your research by reading the `ai_docs/documentation/CONTEXT.md` and `ai_docs/documentation/PRD.md` files.
 
 ## Relevant Files
 
 Focus on the following files:
-- `README.md` - Contains the project overview and instructions.
-- `app/**` - Contains the codebase client/server.
-- `scripts/**` - Contains the scripts to start and stop the server + client.
+- `ai_docs/documentation/CONTEXT.md` - Contains the project context and overview.
+- `ai_docs/documentation/PRD.md` - Contains the product requirements document.
+- `ai_docs/documentation/standards/coding_patterns.md` - Contains coding patterns and standards.
 
 Ignore all other files in the codebase.
 
@@ -54,13 +54,12 @@ Use these files to fix the bug:
 ## Step by Step Tasks
 IMPORTANT: Execute every step in order, top to bottom.
 
-<list step by step tasks as h3 headers plus bullet points. use as many h3 headers as needed to fix the bug. Order matters, start with the foundational shared changes required to fix the bug then move on to the specific changes required to fix the bug. Include tests that will validate the bug is fixed with zero regressions. Your last step should be running the `Validation Commands` to validate the bug is fixed with zero regressions.>
+<list step by step tasks as h3 headers plus bullet points. use as many h3 headers as needed to fix the bug. Order matters, start with the foundational shared changes required to fix the bug then move on to the specific changes required to fix the bug. No testing, keep things simple. Your last step should be running the `Validation Commands` to validate the bug is fixed.>
 
 ## Validation Commands
-Execute every command to validate the bug is fixed with zero regressions.
+Execute every command to validate the bug is fixed.
 
-<list commands you'll use to validate with 100% confidence the bug is fixed with zero regressions. every command must execute without errors so be specific about what you want to run to validate the bug is fixed with zero regressions. Include commands to reproduce the bug before and after the fix.>
-- `cd app/server && uv run pytest` - Run server tests to validate the bug is fixed with zero regressions
+<list commands you'll use to validate the bug is fixed. every command must execute without errors. Include commands to reproduce the bug before and after the fix.>
 
 ## Notes
 <optionally list any additional notes or context that are relevant to the bug that will be helpful to the developer>

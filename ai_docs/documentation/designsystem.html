@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tender Creator - Design System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 50px;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-top: 50px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #2d9b6c;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 30px;
+            margin-bottom: 16px;
+        }
+
+        .section-description {
+            color: #6b7280;
+            margin-bottom: 24px;
+            font-size: 16px;
+        }
+
+        /* Color Palette */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .color-swatch {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-preview {
+            height: 140px;
+            width: 100%;
+        }
+
+        .color-info {
+            padding: 16px;
+            background: white;
+        }
+
+        .color-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .color-values {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .color-value {
+            font-size: 13px;
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+        }
+
+        .color-usage {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Typography */
+        .type-sample {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #2d9b6c;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .type-specs {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Components */
+        .component-showcase {
+            display: grid;
+            gap: 32px;
+            margin-top: 24px;
+        }
+
+        .component-item {
+            padding: 24px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .component-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .component-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #2d9b6c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #25845b;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        .btn-dark {
+            background: #1f2937;
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: #111827;
+        }
+
+        /* Input Fields */
+        .input {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #2d9b6c;
+            box-shadow: 0 0 0 3px rgba(45, 155, 108, 0.1);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: #2d9b6c;
+            background: #f0fdf7;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d9b6c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            padding: 4px 12px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .step-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-inactive {
+            color: #9ca3af;
+        }
+
+        .step-number {
+            font-weight: 700;
+        }
+
+        /* Spacing Scale */
+        .spacing-scale {
+            display: grid;
+            gap: 16px;
+        }
+
+        .spacing-item {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .spacing-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #374151;
+            min-width: 80px;
+        }
+
+        .spacing-visual {
+            height: 24px;
+            background: #2d9b6c;
+            border-radius: 4px;
+        }
+
+        /* Border Radius */
+        .radius-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+        }
+
+        .radius-item {
+            text-align: center;
+        }
+
+        .radius-box {
+            width: 100px;
+            height: 100px;
+            background: #2d9b6c;
+            margin: 0 auto 12px;
+        }
+
+        .radius-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        /* Shadow Styles */
+        .shadow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .shadow-box {
+            width: 100%;
+            height: 120px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-md {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .icon-showcase {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .icon-item {
+            text-align: center;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 24px;
+        }
+
+        .icon-name {
+            font-size: 12px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Tender Creator Design System</h1>
+        <p class="subtitle">A comprehensive guide to the visual design language, components, and patterns used in the Tender Creator application</p>
+
+        <!-- COLOR PALETTE -->
+        <h2>Color Palette</h2>
+        <p class="section-description">The color system is built around a professional green as the primary brand color, with neutral grays for backgrounds and text, ensuring accessibility and visual hierarchy.</p>
+
+        <h3>Primary Colors</h3>
+        <div class="color-grid">
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #2d9b6c;"></div>
+                <div class="color-info">
+                    <div class="color-name">Primary Green</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #2D9B6C</span>
+                        <span class="color-value">RGB: 45, 155, 108</span>
+                    </div>
+                    <div class="color-usage">Used for primary buttons, active states, brand elements, and interactive elements</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #25845b;"></div>
+                <div class="color-info">
+                    <div class="color-name">Primary Green Hover</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #25845B</span>
+                        <span class="color-value">RGB: 37, 132, 91</span>
+                    </div>
+                    <div class="color-usage">Hover state for primary green elements</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #d1fae5;"></div>
+                <div class="color-info">
+                    <div class="color-name">Success Light</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #D1FAE5</span>
+                        <span class="color-value">RGB: 209, 250, 229</span>
+                    </div>
+                    <div class="color-usage">Background for success states, badges, and active progress steps</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #065f46;"></div>
+                <div class="color-info">
+                    <div class="color-name">Success Dark</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #065F46</span>
+                        <span class="color-value">RGB: 6, 95, 70</span>
+                    </div>
+                    <div class="color-usage">Text color for success states and badges</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Neutral Colors</h3>
+        <div class="color-grid">
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #1a1a1a;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 900</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #1A1A1A</span>
+                        <span class="color-value">RGB: 26, 26, 26</span>
+                    </div>
+                    <div class="color-usage">Primary text, headings</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #374151;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 700</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #374151</span>
+                        <span class="color-value">RGB: 55, 65, 81</span>
+                    </div>
+                    <div class="color-usage">Secondary headings, body text</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #6b7280;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 500</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #6B7280</span>
+                        <span class="color-value">RGB: 107, 114, 128</span>
+                    </div>
+                    <div class="color-usage">Supporting text, descriptions, labels</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #9ca3af;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 400</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #9CA3AF</span>
+                        <span class="color-value">RGB: 156, 163, 175</span>
+                    </div>
+                    <div class="color-usage">Disabled text, inactive states</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #d1d5db;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 300</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #D1D5DB</span>
+                        <span class="color-value">RGB: 209, 213, 219</span>
+                    </div>
+                    <div class="color-usage">Borders, dividers</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #e5e7eb;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 200</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #E5E7EB</span>
+                        <span class="color-value">RGB: 229, 231, 235</span>
+                    </div>
+                    <div class="color-usage">Light borders, subtle dividers</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #f3f4f6;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 100</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #F3F4F6</span>
+                        <span class="color-value">RGB: 243, 244, 246</span>
+                    </div>
+                    <div class="color-usage">Sidebar background, card backgrounds</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #f9fafb;"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray 50</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #F9FAFB</span>
+                        <span class="color-value">RGB: 249, 250, 251</span>
+                    </div>
+                    <div class="color-usage">Light backgrounds, hover states</div>
+                </div>
+            </div>
+
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #ffffff; border: 1px solid #e5e7eb;"></div>
+                <div class="color-info">
+                    <div class="color-name">White</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #FFFFFF</span>
+                        <span class="color-value">RGB: 255, 255, 255</span>
+                    </div>
+                    <div class="color-usage">Main background, cards, inputs</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Accent Colors</h3>
+        <div class="color-grid">
+            <div class="color-swatch">
+                <div class="color-preview" style="background: #1f2937;"></div>
+                <div class="color-info">
+                    <div class="color-name">Dark Button</div>
+                    <div class="color-values">
+                        <span class="color-value">HEX: #1F2937</span>
+                        <span class="color-value">RGB: 31, 41, 55</span>
+                    </div>
+                    <div class="color-usage">Dark CTA buttons (e.g., "Invite" button)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TYPOGRAPHY -->
+        <h2>Typography</h2>
+        <p class="section-description">Clean, modern sans-serif typeface with clear hierarchy and excellent readability across all screen sizes.</p>
+
+        <h3>Font Family</h3>
+        <div class="type-sample">
+            <div class="type-label">Primary Font Stack</div>
+            <div style="font-size: 18px;">-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif</div>
+            <div class="type-specs">System font stack for optimal rendering across all platforms</div>
+        </div>
+
+        <h3>Type Scale</h3>
+        <div class="type-sample">
+            <div class="type-label">Heading 1 / Page Title</div>
+            <div style="font-size: 32px; font-weight: 700; color: #1a1a1a;">New Tender</div>
+            <div class="type-specs">font-size: 32px | font-weight: 700 | line-height: 1.2</div>
+        </div>
+
+        <div class="type-sample">
+            <div class="type-label">Heading 2 / Section Title</div>
+            <div style="font-size: 24px; font-weight: 700; color: #1a1a1a;">Team Members</div>
+            <div class="type-specs">font-size: 24px | font-weight: 700 | line-height: 1.3</div>
+        </div>
+
+        <div class="type-sample">
+            <div class="type-label">Heading 3 / Card Title</div>
+            <div style="font-size: 20px; font-weight: 600; color: #374151;">Admin</div>
+            <div class="type-specs">font-size: 20px | font-weight: 600 | line-height: 1.4</div>
+        </div>
+
+        <div class="type-sample">
+            <div class="type-label">Body Large / Description</div>
+            <div style="font-size: 16px; font-weight: 400; color: #374151;">Manage your team, invite additional users to your team via email and assign roles to members of your team.</div>
+            <div class="type-specs">font-size: 16px | font-weight: 400 | line-height: 1.6</div>
+        </div>
+
+        <div class="type-sample">
+            <div class="type-label">Body / Regular Text</div>
+            <div style="font-size: 15px; font-weight: 400; color: #374151;">A descriptive name for your tender. This will be automatically generated when you upload documents.</div>
+            <div class="type-specs">font-size: 15px | font-weight: 400 | line-height: 1.6</div>
+        </div>
+
+        <div class="type-sample">
+            <div class="type-label">Body Small / Helper Text</div>
+            <div style="font-size: 14px; font-weight: 400; color: #6b7280;">Technical requirements, NFRs, deliverables/milestones</div>
+            <div class="type-specs">font-size: 14px | font-weight: 400 | line-height: 1.5 | color: gray-500</div>
+        </div>
+
+        <div class="type-sample">
+            <div class="type-label">Caption / Label</div>
+            <div style="font-size: 13px; font-weight: 500; color: #6b7280;">Weights, scoring rubric, mandatory gates</div>
+            <div class="type-specs">font-size: 13px | font-weight: 500 | line-height: 1.4</div>
+        </div>
+
+        <!-- SPACING -->
+        <h2>Spacing & Layout</h2>
+        <p class="section-description">Consistent spacing scale based on 4px increments for harmonious layouts and visual rhythm.</p>
+
+        <div class="spacing-scale">
+            <div class="spacing-item">
+                <span class="spacing-value">4px</span>
+                <div class="spacing-visual" style="width: 4px;"></div>
+                <span style="color: #6b7280;">Micro spacing (icon gaps, tight elements)</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">8px</span>
+                <div class="spacing-visual" style="width: 8px;"></div>
+                <span style="color: #6b7280;">Small spacing (button padding, list items)</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">12px</span>
+                <div class="spacing-visual" style="width: 12px;"></div>
+                <span style="color: #6b7280;">Medium spacing (card padding, form fields)</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">16px</span>
+                <div class="spacing-visual" style="width: 16px;"></div>
+                <span style="color: #6b7280;">Default spacing (general gaps)</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">20px</span>
+                <div class="spacing-visual" style="width: 20px;"></div>
+                <span style="color: #6b7280;">Large spacing (section gaps)</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">24px</span>
+                <div class="spacing-visual" style="width: 24px;"></div>
+                <span style="color: #6b7280;">Extra large (between major sections)</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">32px</span>
+                <div class="spacing-visual" style="width: 32px;"></div>
+                <span style="color: #6b7280;">Section spacing</span>
+            </div>
+            <div class="spacing-item">
+                <span class="spacing-value">40px</span>
+                <div class="spacing-visual" style="width: 40px;"></div>
+                <span style="color: #6b7280;">Large section gaps</span>
+            </div>
+        </div>
+
+        <!-- BORDER RADIUS -->
+        <h2>Border Radius</h2>
+        <p class="section-description">Rounded corners create a friendly, modern aesthetic throughout the interface.</p>
+
+        <div class="radius-grid">
+            <div class="radius-item">
+                <div class="radius-box" style="border-radius: 6px;"></div>
+                <div class="radius-label">Small: 6px</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Badges, tags</div>
+            </div>
+            <div class="radius-item">
+                <div class="radius-box" style="border-radius: 8px;"></div>
+                <div class="radius-label">Medium: 8px</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Buttons, inputs, cards</div>
+            </div>
+            <div class="radius-item">
+                <div class="radius-box" style="border-radius: 12px;"></div>
+                <div class="radius-label">Large: 12px</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Major containers</div>
+            </div>
+            <div class="radius-item">
+                <div class="radius-box" style="border-radius: 50%;"></div>
+                <div class="radius-label">Full: 50%</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Avatars, icons</div>
+            </div>
+        </div>
+
+        <!-- SHADOWS -->
+        <h2>Elevation & Shadows</h2>
+        <p class="section-description">Subtle shadows create depth and hierarchy without overwhelming the interface.</p>
+
+        <div class="shadow-grid">
+            <div>
+                <div class="shadow-box shadow-sm">Small Shadow</div>
+                <div style="font-size: 13px; color: #6b7280; margin-top: 12px; font-family: 'Courier New', monospace;">
+                    0 1px 2px rgba(0,0,0,0.05)
+                </div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Subtle elevation for cards</div>
+            </div>
+            <div>
+                <div class="shadow-box shadow-md">Medium Shadow</div>
+                <div style="font-size: 13px; color: #6b7280; margin-top: 12px; font-family: 'Courier New', monospace;">
+                    0 2px 8px rgba(0,0,0,0.08)
+                </div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Default card elevation</div>
+            </div>
+            <div>
+                <div class="shadow-box shadow-lg">Large Shadow</div>
+                <div style="font-size: 13px; color: #6b7280; margin-top: 12px; font-family: 'Courier New', monospace;">
+                    0 4px 16px rgba(0,0,0,0.12)
+                </div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Modals, dropdowns</div>
+            </div>
+        </div>
+
+        <!-- COMPONENTS -->
+        <h2>Components</h2>
+        <p class="section-description">Reusable UI elements that maintain consistency throughout the application.</p>
+
+        <div class="component-showcase">
+            <!-- Buttons -->
+            <div class="component-item">
+                <div class="component-label">Buttons</div>
+                <div class="component-preview">
+                    <button class="btn btn-primary">
+                        <span style="font-size: 18px;">+</span> Create new tender
+                    </button>
+                    <button class="btn btn-dark">Invite</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+                    <strong>Specs:</strong> padding: 10px 20px | border-radius: 8px | font-weight: 500 | font-size: 15px
+                </div>
+            </div>
+
+            <!-- Input Fields -->
+            <div class="component-item">
+                <div class="component-label">Input Fields</div>
+                <div class="component-preview" style="display: block;">
+                    <input type="text" class="input" placeholder="Tender Name">
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+                    <strong>Specs:</strong> padding: 12px 16px | border: 1px solid #d1d5db | border-radius: 8px | font-size: 15px<br>
+                    <strong>Focus:</strong> border-color: #2d9b6c | box-shadow: 0 0 0 3px rgba(45,155,108,0.1)
+                </div>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="component-item">
+                <div class="component-label">Upload Area</div>
+                <div class="component-preview" style="display: block;">
+                    <div class="upload-area">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📄</div>
+                        <div style="color: #374151;">Click to add additional documents</div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+                    <strong>Specs:</strong> border: 2px dashed #d1d5db | border-radius: 8px | padding: 40px<br>
+                    <strong>Hover:</strong> border-color: #2d9b6c | background: #f0fdf7
+                </div>
+            </div>
+
+            <!-- Avatar -->
+            <div class="component-item">
+                <div class="component-label">Avatar</div>
+                <div class="component-preview">
+                    <div class="avatar">K</div>
+                    <div class="avatar" style="background: #6366f1;">J</div>
+                    <div class="avatar" style="background: #f59e0b;">M</div>
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+                    <strong>Specs:</strong> width/height: 40px | border-radius: 50% | background: #2d9b6c (or custom) | font-weight: 600
+                </div>
+            </div>
+
+            <!-- Badge -->
+            <div class="component-item">
+                <div class="component-label">Badge</div>
+                <div class="component-preview">
+                    <div class="badge">CREATOR ROLE</div>
+                    <div class="badge" style="background: #dbeafe; color: #1e40af;">ADMIN</div>
+                    <div class="badge" style="background: #fef3c7; color: #92400e;">PENDING</div>
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+                    <strong>Specs:</strong> padding: 4px 12px | border-radius: 6px | font-size: 12px | font-weight: 600 | text-transform: uppercase
+                </div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="component-item">
+                <div class="component-label">Progress Steps</div>
+                <div class="component-preview" style="display: block;">
+                    <div class="progress-steps">
+                        <div class="step step-active">
+                            <span class="step-number">1.</span> New Tender
+                        </div>
+                        <div class="step step-inactive">
+                            <span class="step-number">2.</span> Tender Planning
+                        </div>
+                        <div class="step step-inactive">
+                            <span class="step-number">3.</span> Tender Outline
+                        </div>
+                        <div class="step step-inactive">
+                            <span class="step-number">4.</span> Tender Content
+                        </div>
+                        <div class="step step-inactive">
+                            <span class="step-number">5.</span> Tender Export
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; font-size: 13px; color: #6b7280;">
+                    <strong>Active:</strong> background: #d1fae5 | color: #065f46<br>
+                    <strong>Inactive:</strong> color: #9ca3af
+                </div>
+            </div>
+        </div>
+
+        <!-- ICONS -->
+        <h2>Iconography</h2>
+        <p class="section-description">Simple, clean icons that integrate seamlessly with the interface. Minimal and functional design.</p>
+
+        <div class="icon-showcase">
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">🏠</div>
+                <div class="icon-name">Home</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">🏢</div>
+                <div class="icon-name">Company</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">📋</div>
+                <div class="icon-name">Tenders</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">👥</div>
+                <div class="icon-name">Team</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">💳</div>
+                <div class="icon-name">Billing</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">⚙️</div>
+                <div class="icon-name">Settings</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">📖</div>
+                <div class="icon-name">Resources</div>
+            </div>
+            <div class="icon-item">
+                <div class="icon-box" style="background: #2d9b6c; color: white;">📄</div>
+                <div class="icon-name">Documentation</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; padding: 20px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #2d9b6c;">
+            <strong style="color: #374151;">Icon Style Guidelines:</strong>
+            <ul style="margin-top: 8px; color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li>Use outline style for inactive/default states</li>
+                <li>Use solid or colored style for active states</li>
+                <li>Standard size: 20-24px for navigation, 16-18px for inline icons</li>
+                <li>Color: #6b7280 (inactive), #2d9b6c (active/primary)</li>
+            </ul>
+        </div>
+
+        <!-- LAYOUT STRUCTURE -->
+        <h2>Layout Structure</h2>
+        <p class="section-description">Consistent layout patterns ensure predictable navigation and content organization.</p>
+
+        <div style="background: #f9fafb; padding: 24px; border-radius: 12px; margin-top: 24px;">
+            <h3 style="margin-top: 0;">Sidebar Navigation</h3>
+            <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Width:</strong> ~200px fixed</li>
+                <li><strong>Background:</strong> #f3f4f6 (light gray)</li>
+                <li><strong>Items:</strong> 16px vertical padding, 8px border-radius on hover</li>
+                <li><strong>Active state:</strong> Light gray background (#f9fafb), primary green icon</li>
+                <li><strong>Spacing:</strong> 8-12px between items</li>
+            </ul>
+        </div>
+
+        <div style="background: #f9fafb; padding: 24px; border-radius: 12px; margin-top: 24px;">
+            <h3 style="margin-top: 0;">Main Content Area</h3>
+            <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Background:</strong> White (#ffffff)</li>
+                <li><strong>Padding:</strong> 40-60px on all sides</li>
+                <li><strong>Max width:</strong> Responsive, typically 1200-1400px</li>
+                <li><strong>Cards:</strong> White background, 1px border (#e5e7eb), 8-12px border-radius, subtle shadow</li>
+            </ul>
+        </div>
+
+        <!-- INTERACTIONS -->
+        <h2>Interactions & States</h2>
+        <p class="section-description">Smooth, intuitive interactions with clear feedback for all user actions.</p>
+
+        <div style="background: #f9fafb; padding: 24px; border-radius: 12px; margin-top: 24px;">
+            <h3 style="margin-top: 0;">Button States</h3>
+            <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Default:</strong> Solid background color</li>
+                <li><strong>Hover:</strong> Slightly darker background (10-15% darker)</li>
+                <li><strong>Active/Press:</strong> Even darker, slight scale transform</li>
+                <li><strong>Disabled:</strong> Reduced opacity (50-60%), cursor: not-allowed</li>
+                <li><strong>Transition:</strong> all 0.2s ease</li>
+            </ul>
+        </div>
+
+        <div style="background: #f9fafb; padding: 24px; border-radius: 12px; margin-top: 24px;">
+            <h3 style="margin-top: 0;">Input States</h3>
+            <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Default:</strong> 1px border (#d1d5db)</li>
+                <li><strong>Focus:</strong> Primary green border (#2d9b6c), subtle green shadow ring</li>
+                <li><strong>Error:</strong> Red border, error message below</li>
+                <li><strong>Disabled:</strong> Gray background, reduced opacity</li>
+            </ul>
+        </div>
+
+        <div style="background: #f9fafb; padding: 24px; border-radius: 12px; margin-top: 24px;">
+            <h3 style="margin-top: 0;">Hover Effects</h3>
+            <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Cards:</strong> Subtle shadow increase, slight border color change</li>
+                <li><strong>Links:</strong> Underline, color darkening</li>
+                <li><strong>Table rows:</strong> Light gray background (#f9fafb)</li>
+                <li><strong>Icons:</strong> Color change to primary green</li>
+            </ul>
+        </div>
+
+        <!-- ACCESSIBILITY -->
+        <h2>Accessibility Notes</h2>
+        <p class="section-description">Design system follows WCAG 2.1 AA standards for inclusive, accessible experiences.</p>
+
+        <div style="background: #f9fafb; padding: 24px; border-radius: 12px; margin-top: 24px;">
+            <ul style="color: #6b7280; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Color Contrast:</strong> All text meets minimum 4.5:1 contrast ratio against backgrounds</li>
+                <li><strong>Focus States:</strong> Clear visible focus indicators on all interactive elements</li>
+                <li><strong>Touch Targets:</strong> Minimum 40x40px for all clickable elements (buttons, links)</li>
+                <li><strong>Alt Text:</strong> All icons paired with text labels or aria-labels</li>
+                <li><strong>Keyboard Navigation:</strong> All functions accessible via keyboard</li>
+                <li><strong>Screen Readers:</strong> Semantic HTML structure, proper heading hierarchy</li>
+            </ul>
+        </div>
+
+        <!-- USAGE GUIDELINES -->
+        <h2>Usage Guidelines</h2>
+        
+        <div style="background: #d1fae5; padding: 24px; border-radius: 12px; margin-top: 24px; border-left: 4px solid #2d9b6c;">
+            <h3 style="margin-top: 0; color: #065f46;">✓ Do</h3>
+            <ul style="color: #065f46; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li>Use the primary green (#2d9b6c) for main CTAs and active states</li>
+                <li>Maintain consistent spacing using the 4px grid system</li>
+                <li>Use appropriate border radius for component type</li>
+                <li>Keep text hierarchy clear with proper sizing and weight</li>
+                <li>Apply subtle shadows for elevation and depth</li>
+                <li>Ensure sufficient color contrast for readability</li>
+            </ul>
+        </div>
+
+        <div style="background: #fee2e2; padding: 24px; border-radius: 12px; margin-top: 24px; border-left: 4px solid #dc2626;">
+            <h3 style="margin-top: 0; color: #991b1b;">✗ Don't</h3>
+            <ul style="color: #991b1b; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li>Use colors outside the defined palette without consultation</li>
+                <li>Apply inconsistent spacing or random pixel values</li>
+                <li>Over-use bold text or uppercase styling</li>
+                <li>Create custom shadow styles; use predefined elevation system</li>
+                <li>Mix different border radius values within the same component group</li>
+                <li>Compromise accessibility for visual preference</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #e5e7eb; text-align: center; color: #9ca3af; font-size: 14px;">
+            <p>Tender Creator Design System v1.0 • Extracted from Application Screenshots • November 2025</p>
+        </div>
+    </div>
+</body>
+</html>
