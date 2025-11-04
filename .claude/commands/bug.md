@@ -22,7 +22,7 @@ Create a new plan in specs/*.md to resolve the `Bug` using the exact specified m
 Focus on the following files:
 - `ai_docs/documentation/CONTEXT.md` - Contains the project context and overview.
 - `ai_docs/documentation/PRD.md` - Contains the product requirements document.
-- `ai_docs/documentation/standards/coding_patterns.md` - Contains coding patterns and standards.
+- `ai_docs/documentation/standards/*` - Contains coding patterns and standards.
 
 Ignore all other files in the codebase.
 
