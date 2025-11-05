@@ -17,7 +17,12 @@ Create a comprehensive plan in ai_docs/documentation/phases_spec/<phase_name>/ t
   - Create research documentation in the phase folder
 - Create all outputs in `ai_docs/documentation/phases_spec/<phase_name>/` where <phase_name> is derived from the phase description.
 - Follow existing patterns and conventions in the codebase. Don't reinvent the wheel.
-- If you need a new library, use `uv add` and be sure to report it in the `Notes` section.
+- If you need a new library, use `npm install` and be sure to report it in the `Notes` section.
+-IMPORTANT: If the feature includes UI components or user interactions:
+Add a task in the Step by Step Tasks section to create a separate E2E test file in .claude/commands/e2e/test_<descriptive_name>.md based on examples in that directory
+Add E2E test validation to your Validation Commands section
+IMPORTANT: When you fill out the Plan Format: Relevant Files section, add an instruction to read .claude/commands/test_e2e.md, and .claude/commands/e2e/test_basic_query.md to understand how to create an E2E test file. List your new E2E test file to the Plan Format: New Files section.
+To be clear, we're not creating a new E2E test file, we're creating a task to create a new E2E test file in the Plan Format below
 - Respect requested files in the `Relevant Files` section.
 - Start your research by reading the `ai_docs/documentation/CONTEXT.md` and `ai_docs/documentation/PRD.md` files.
 

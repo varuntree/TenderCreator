@@ -1,6 +1,6 @@
 # E2E Test Runner
 
-Execute end-to-end (E2E) tests using Playwright browser automation (MCP Server). If any errors occur and assertions fail mark the test as failed and explain exactly what went wrong. then resolve that bug ( actully figuring out why) and then continue with the rest of the flow. 
+Execute end-to-end (E2E) tests using Playwright browser automation (MCP Server). If any errors occur and assertions fail mark the test as failed and explain exactly what went wrong. then resolve that bug ( actully figuring out why) and then continue with the rest of the flow, and complete this end to end.
  
 ## Variables
 
