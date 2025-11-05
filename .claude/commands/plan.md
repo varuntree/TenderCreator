@@ -171,6 +171,10 @@ Execute every command to validate the phase works correctly.
 
 <If you created an E2E test, include the following validation step: `Read .claude/commands/test_e2e.md`, then read and execute your new E2E `.claude/commands/e2e/test_<descriptive_name>.md` test file to validate this functionality works.>
 
+**E2E Testing Strategy:**
+- Use pre-configured test credentials from test_e2e.md (DO NOT create new users)
+- Reference absolute paths for test fixtures in test_fixtures/
+- Sign in via email/password: test@tendercreator.dev / TestPass123!
 
 # Implementation log created at:
 # {plan_directory}/{phase_name}_implementation.log
