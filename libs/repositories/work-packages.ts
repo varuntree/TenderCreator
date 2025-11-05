@@ -15,7 +15,7 @@ export interface WorkPackage {
   document_description: string | null
   requirements: Requirement[]
   assigned_to: string | null
-  status: 'not_started' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'completed'
   order: number
   created_at: string
   updated_at: string
@@ -27,14 +27,14 @@ export interface CreateWorkPackageData {
   document_description?: string | null
   requirements?: Requirement[]
   order?: number
-  status?: 'not_started' | 'in_progress' | 'completed'
+  status?: 'pending' | 'in_progress' | 'completed'
 }
 
 export interface UpdateWorkPackageData {
   document_type?: string
   document_description?: string | null
   requirements?: Requirement[]
-  status?: 'not_started' | 'in_progress' | 'completed'
+  status?: 'pending' | 'in_progress' | 'completed'
   assigned_to?: string | null
 }
 
@@ -53,7 +53,7 @@ export async function createWorkPackage(
       document_description: data.document_description || null,
       requirements: data.requirements || [],
       order: data.order || 0,
-      status: data.status || 'not_started',
+      status: data.status || 'pending',
     })
     .select()
     .single()
@@ -232,4 +232,45 @@ export async function getWorkPackageWithProject(
     workPackage: workPackage,
     project: workPackage.project,
   }
+}
+
+/**
+ * Get all completed work packages for a project
+ * Used for bulk export
+ */
+export async function listCompletedWorkPackages(
+  supabase: SupabaseClient,
+  projectId: string
+): Promise<WorkPackage[]> {
+  const { data, error } = await supabase
+    .from('work_packages')
+    .select('*')
+    .eq('project_id', projectId)
+    .eq('status', 'completed')
+    .order('order', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
+/**
+ * Get next incomplete work package for workflow navigation
+ * Returns first work package with status='not_started'
+ * Returns null if all complete
+ */
+export async function getNextIncompleteWorkPackage(
+  supabase: SupabaseClient,
+  projectId: string
+): Promise<WorkPackage | null> {
+  const { data, error } = await supabase
+    .from('work_packages')
+    .select('*')
+    .eq('project_id', projectId)
+    .eq('status', 'not_started')
+    .order('order', { ascending: true })
+    .limit(1)
+    .single()
+
+  if (error && error.code !== 'PGRST116') throw error // PGRST116 = no rows
+  return data || null
 }

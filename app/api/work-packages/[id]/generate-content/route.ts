@@ -1,3 +1,5 @@
+export const runtime = 'edge' // Bypass Vercel 10s timeout
+
 import { NextRequest } from 'next/server'
 import { createClient } from '@/libs/supabase/server'
 import { getWorkPackageWithProject, updateWorkPackageStatus } from '@/libs/repositories/work-packages'

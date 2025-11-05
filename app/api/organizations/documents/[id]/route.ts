@@ -9,10 +9,10 @@ import {
 async function handleDELETE(
   request: NextRequest,
   { supabase }: AuthContext,
-  params: { params: { id: string } }
+  params: { params: Promise<{ id: string }> }
 ) {
   try {
-    const docId = params.params.id
+    const { id: docId } = await params.params
 
     // Get document to get file path
     const doc = await getOrganizationDocument(supabase, docId)

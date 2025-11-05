@@ -1,0 +1,245 @@
+NSW GOVERNMENT - COMMUNITY CENTRE REDEVELOPMENT
+Request for Tender (RFT)
+
+Project Reference: GOV-CC-2025-001
+Closing Date: March 31, 2025
+
+SECTION 1: SUBMISSION REQUIREMENTS
+
+All tenderers must submit the following documents:
+
+1. Technical Specification (MANDATORY)
+   - Detailed construction methodology
+   - Timeline with milestones
+   - Resource allocation plan
+   - Site management approach
+   - Quality control procedures
+   - Testing and commissioning plan
+   - Handover documentation
+
+2. Bill of Quantities (MANDATORY)
+   - Itemized cost breakdown
+   - Labor and materials
+   - Contingency allowances
+   - Price schedule by phase
+   - Payment milestones
+
+3. Project Methodology (MANDATORY)
+   - Overall approach
+   - Phase breakdown
+   - Quality assurance processes
+   - Risk management framework
+   - Stakeholder engagement plan
+
+4. Risk Register (MANDATORY)
+   - Identified risks (minimum 10)
+   - Mitigation strategies
+   - Risk ownership
+   - Likelihood and impact assessment
+   - Contingency plans
+
+5. Work Health & Safety Plan (MANDATORY)
+   - Site safety procedures
+   - Emergency response protocols
+   - Training requirements
+   - PPE requirements
+   - Incident reporting procedures
+
+6. Quality Management Plan (MANDATORY)
+   - Quality standards
+   - Inspection procedures
+   - Documentation requirements
+   - Non-conformance management
+   - Continuous improvement
+
+7. Environmental Management Plan (MANDATORY)
+   - Environmental impact assessment
+   - Mitigation measures
+   - Compliance documentation
+   - Waste management plan
+   - Sustainability initiatives
+
+8. Subcontractor Management Plan (MANDATORY)
+   - List of proposed subcontractors
+   - Capability statements
+   - Management approach
+   - Quality control measures
+
+9. Company Profile (MANDATORY)
+   - Company overview
+   - Relevant experience
+   - Key personnel CVs
+   - Financial capacity
+   - References from similar projects
+
+10. Insurance Certificates (MANDATORY)
+    - Public liability insurance
+    - Professional indemnity
+    - Workers compensation
+    - Contract works insurance
+
+SECTION 2: TECHNICAL SPECIFICATION REQUIREMENTS
+
+The Technical Specification must address:
+- Construction approach using modular methodology
+- Detailed timeline with monthly milestones spanning 12 months
+- Resource allocation including labor (minimum 15 FTE), equipment, and materials
+- Site constraints and access limitations management
+- Coordination with existing facility operations
+- Traffic management during construction
+- Noise and dust control measures
+- Community engagement during construction phase
+
+SECTION 3: BILL OF QUANTITIES REQUIREMENTS
+
+The Bill of Quantities must include:
+- Itemized breakdown by construction phase
+- Labor costs with skill categories (supervisors, skilled, unskilled)
+- Materials with supplier details and lead times
+- Equipment hire costs
+- Subcontractor costs
+- Preliminaries and general costs
+- Contingency breakdown (minimum 5%)
+
+SECTION 4: PROJECT METHODOLOGY REQUIREMENTS
+
+The Project Methodology must describe:
+- Overall project delivery framework
+- Construction sequencing and logic
+- Interface management between trades
+- Quality assurance and testing protocols
+- Progress reporting and governance
+- Change management procedures
+- Stakeholder communication plan
+- Community consultation approach
+
+SECTION 5: RISK REGISTER REQUIREMENTS
+
+The Risk Register must contain:
+- Minimum 10 identified risks across categories:
+  * Construction risks
+  * Environmental risks
+  * Safety risks
+  * Financial risks
+  * Stakeholder risks
+- Likelihood rating (1-5)
+- Impact rating (1-5)
+- Current controls
+- Mitigation strategies
+- Risk owner assignment
+- Residual risk rating
+
+SECTION 6: WORK HEALTH & SAFETY PLAN REQUIREMENTS
+
+The WHS Plan must include:
+- Site-specific hazard identification
+- Safety management structure
+- Induction and training programs
+- Emergency evacuation procedures
+- First aid facilities and trained personnel
+- Incident investigation procedures
+- Safety inspections and audits schedule
+- Contractor and visitor management
+- Personal protective equipment requirements
+
+SECTION 7: QUALITY MANAGEMENT PLAN REQUIREMENTS
+
+The Quality Management Plan must describe:
+- Quality policy and objectives
+- Quality organizational structure
+- Inspection and test plans
+- Hold points and witness points
+- Non-conformance procedures
+- Corrective and preventive actions
+- Document control procedures
+- Records management
+- Continuous improvement processes
+
+SECTION 8: ENVIRONMENTAL MANAGEMENT PLAN REQUIREMENTS
+
+The Environmental Management Plan must address:
+- Environmental policy commitment
+- Environmental aspects and impacts register
+- Legal and regulatory compliance
+- Waste minimization and recycling
+- Energy and water conservation
+- Noise management
+- Dust and air quality control
+- Erosion and sediment control
+- Flora and fauna protection
+- Environmental incidents and emergency response
+
+SECTION 9: SUBCONTRACTOR MANAGEMENT REQUIREMENTS
+
+The Subcontractor Management Plan must include:
+- List of all proposed subcontractors with:
+  * Company details
+  * Scope of work
+  * Relevant experience
+  * Insurance coverage
+  * Safety record
+- Subcontractor selection process
+- Performance monitoring approach
+- Payment terms and schedule
+- Quality control measures
+- Communication protocols
+
+SECTION 10: COMPANY PROFILE REQUIREMENTS
+
+The Company Profile must demonstrate:
+- Company history and structure
+- Financial stability (audited accounts last 3 years)
+- Experience in similar projects (minimum 3 references)
+- Current workload and capacity
+- Key personnel qualifications and experience
+- Organizational chart for this project
+- Local presence and community involvement
+- Innovation and technology capabilities
+
+PROJECT SPECIFIC REQUIREMENTS
+
+Budget: $5.2 million (GST exclusive)
+Duration: 12 months from commencement
+Location: 123 Main Street, Sydney NSW
+Existing Operations: Facility to remain partially operational during construction
+Heritage Considerations: Building is heritage listed, special care required
+Community Consultation: Mandatory monthly community meetings
+
+EVALUATION CRITERIA
+
+Submissions will be evaluated on:
+1. Technical Specification (25%)
+2. Project Methodology (20%)
+3. Price (Bill of Quantities) (25%)
+4. Risk Management (10%)
+5. WHS and Quality Plans (10%)
+6. Company Experience and Capacity (10%)
+
+MANDATORY REQUIREMENTS
+
+All documents listed in Section 1 must be submitted.
+Failure to submit any mandatory document will result in disqualification.
+Documents must follow naming convention: [DocumentType]_[CompanyName].pdf
+Maximum page limits apply:
+- Technical Specification: 30 pages
+- Bill of Quantities: No limit
+- Project Methodology: 20 pages
+- Risk Register: 10 pages
+- WHS Plan: 15 pages
+- Quality Management Plan: 15 pages
+- Environmental Management Plan: 15 pages
+- Subcontractor Management Plan: 10 pages
+- Company Profile: 15 pages
+- Insurance Certificates: As required
+
+SUBMISSION INSTRUCTIONS
+
+Submit all documents via the NSW Government eTendering portal by 5:00 PM AEST on March 31, 2025.
+Late submissions will not be accepted.
+Questions must be submitted via the portal by March 10, 2025.
+Site inspection: March 5, 2025 at 10:00 AM (mandatory)
+
+For inquiries contact:
+Project Manager: Sarah Johnson
+Email: sarah.johnson@nsw.gov.au
+Phone: (02) 9000 0000

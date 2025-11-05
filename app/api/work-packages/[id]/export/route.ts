@@ -1,3 +1,5 @@
+export const runtime = 'nodejs' // Need docx library
+
 import { NextRequest } from 'next/server'
 import { createClient } from '@/libs/supabase/server'
 import {

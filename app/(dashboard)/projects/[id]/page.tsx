@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { AnalysisTrigger } from '@/components/analysis-trigger'
+import { BulkExportButton } from '@/components/bulk-export-button'
 import DocumentList from '@/components/document-list'
 import FileUpload from '@/components/file-upload'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,7 @@ interface WorkPackage {
     source: string
   }>
   assigned_to: string | null
-  status: 'not_started' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'completed'
 }
 
 export default function ProjectDetailPage() {
@@ -149,11 +150,29 @@ export default function ProjectDetailPage() {
         )}
 
         {project.status === 'in_progress' && (
-          <WorkPackageDashboard
-            projectId={projectId}
-            workPackages={workPackages}
-            onUpdate={loadData}
-          />
+          <>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold">Work Packages</h2>
+                <p className="text-sm text-muted-foreground">
+                  {workPackages.filter(wp => wp.status === 'completed').length} of {workPackages.length} completed
+                </p>
+              </div>
+
+              {workPackages.filter(wp => wp.status === 'completed').length > 0 && (
+                <BulkExportButton
+                  projectId={projectId}
+                  completedCount={workPackages.filter(wp => wp.status === 'completed').length}
+                />
+              )}
+            </div>
+
+            <WorkPackageDashboard
+              projectId={projectId}
+              workPackages={workPackages}
+              onUpdate={loadData}
+            />
+          </>
         )}
       </div>
     </div>

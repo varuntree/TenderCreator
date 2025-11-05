@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, FileDown, Check, Home } from 'lucide-react'
+import { Loader2, FileDown, Check, Home, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { WorkPackage } from '@/libs/repositories/work-packages'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface ExportScreenProps {
   workPackageId: string
@@ -24,9 +25,19 @@ export function ExportScreen({
   wordCount,
   lastUpdated,
 }: ExportScreenProps) {
+  const router = useRouter()
   const [isExporting, setIsExporting] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
+  const [nextWorkPackage, setNextWorkPackage] = useState<WorkPackage | null>(null)
+
+  useEffect(() => {
+    // Fetch next incomplete work package
+    fetch(`/api/projects/${projectId}/next-work-package`)
+      .then(res => res.json())
+      .then(data => setNextWorkPackage(data.work_package))
+      .catch(err => console.error('Failed to fetch next work package:', err))
+  }, [projectId])
 
   const handleExport = async () => {
     setIsExporting(true)
@@ -69,19 +80,37 @@ export function ExportScreen({
               </p>
             </div>
             {downloadUrl && (
-              <Button asChild>
+              <Button asChild variant="outline">
                 <a href={downloadUrl} download>
                   <FileDown className="mr-2 size-4" />
                   Download Again
                 </a>
               </Button>
             )}
-            <Button variant="outline" asChild className="w-full">
-              <Link href={`/projects/${projectId}`}>
-                <Home className="mr-2 size-4" />
-                Back to Dashboard
-              </Link>
-            </Button>
+            <div className="flex gap-3 w-full">
+              <Button variant="outline" asChild className="flex-1">
+                <Link href={`/projects/${projectId}`}>
+                  <Home className="mr-2 size-4" />
+                  Back to Dashboard
+                </Link>
+              </Button>
+
+              {nextWorkPackage ? (
+                <Button
+                  onClick={() => router.push(`/work-packages/${nextWorkPackage.id}`)}
+                  className="gap-2 flex-1"
+                >
+                  Continue to Next Document
+                  <ArrowRight className="size-4" />
+                </Button>
+              ) : (
+                <Button asChild className="flex-1">
+                  <Link href={`/projects/${projectId}`}>
+                    All Documents Complete
+                  </Link>
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

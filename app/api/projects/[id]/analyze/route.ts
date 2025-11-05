@@ -106,22 +106,29 @@ export async function POST(
 
           // Create work packages progressively
           if (result.documents) {
+            console.log('[Analysis] Creating', result.documents.length, 'work packages')
             for (let i = 0; i < result.documents.length; i++) {
               const doc = result.documents[i]
-              const workPackage = await createWorkPackage(supabase, {
-                project_id: projectId,
-                document_type: doc.document_type,
-                document_description: doc.description,
-                requirements: doc.requirements,
-                order: i,
-                status: 'not_started',
-              })
-
-              sendEvent('document', workPackage)
+              try {
+                const workPackage = await createWorkPackage(supabase, {
+                  project_id: projectId,
+                  document_type: doc.document_type,
+                  document_description: doc.description,
+                  requirements: doc.requirements,
+                  order: i,
+                  status: 'pending',
+                })
+                console.log('[Analysis] Created work package:', workPackage.id, doc.document_type)
+                sendEvent('document', workPackage)
+              } catch (error) {
+                console.error('[Analysis] Failed to create work package:', error)
+                throw error
+              }
             }
 
             // Update project status to in_progress
             await updateProjectStatus(supabase, projectId, 'in_progress')
+            console.log('[Analysis] Updated project status to in_progress')
             sendEvent('complete', { count: result.documents.length })
           }
 

@@ -6,7 +6,14 @@ const withMDX = createMDX({
 })
 
 const nextConfig: NextConfig = {
+  // Standalone output for Vercel (reduces bundle size)
+  output: 'standalone',
+
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+
+  // External packages (don't bundle)
+  serverExternalPackages: ['docx'],
+
   images: {
     remotePatterns: [
       {
@@ -20,6 +27,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https' as const,
         hostname: 'cdn.prod.website-files.com',
+      },
+      {
+        protocol: 'https' as const,
+        hostname: '**.supabase.co',
       },
     ],
   },

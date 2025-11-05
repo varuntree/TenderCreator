@@ -1,3 +1,5 @@
+export const runtime = 'edge' // Fast AI actions
+
 import { NextRequest } from 'next/server'
 import { createClient } from '@/libs/supabase/server'
 import { getWorkPackageWithProject } from '@/libs/repositories/work-packages'
