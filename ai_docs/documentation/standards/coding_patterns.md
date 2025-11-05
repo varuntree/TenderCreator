@@ -228,6 +228,14 @@ import { Spinner } from 'antd'
 - [ ] No unnecessary complexity (keep MVP simple)
 - [ ] Clear, concise code (avoid over-engineering)
 
+### Phase 2 Lessons (Enum & Schema Safety):
+- [ ] Enum changes: Database migration FIRST, code update SECOND
+- [ ] Search ALL occurrences when changing enum values (including defaults)
+- [ ] Empty strings → null conversion for optional fields
+- [ ] Validate external API model names exist before deployment
+- [ ] Use generated Supabase types to catch column name errors
+- [ ] Test both auto-creation AND manual-creation code paths
+
 ---
 
 **Remember**: Read architecture files before each phase. Keep code lean, functional, and aligned with system design.
