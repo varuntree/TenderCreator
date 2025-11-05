@@ -8,7 +8,20 @@ const withMDX = createMDX({
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   images: {
-    domains: ['images.unsplash.com', 'logo.clearbit.com', 'cdn.prod.website-files.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'logo.clearbit.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.prod.website-files.com',
+      },
+    ],
   },
 };
 

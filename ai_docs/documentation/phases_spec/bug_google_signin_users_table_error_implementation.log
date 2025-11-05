@@ -1,0 +1,33 @@
+# Implementation Log: Google Sign-in Bug Fix
+
+## Timestamp: 2025-11-05T00:15:00Z
+## Steps Completed: 1-3
+## Summary:
+Fixed auth callback to auto-create user/org records, made projects page handle missing org gracefully, fixed Next.js config warnings.
+
+### Files Changed: 5
+1. app/auth/callback/route.ts - Added user/org creation logic after OAuth exchange
+2. libs/repositories/organizations.ts - Updated createOrganization to accept email/name, made getOrganizationByUserId use maybeSingle()
+3. app/(dashboard)/projects/page.tsx - Added fallback UI for missing org
+4. app/layout.tsx - Added metadataBase for OG images
+5. next.config.ts - Changed images.domains to remotePatterns
+
+### Changes Detail:
+- Auth callback now checks if user exists in custom users table after OAuth
+- If new user, creates default org (name from profile/email) with createOrganization()
+- getOrganizationByUserId returns null instead of throwing on missing user
+- Projects page shows "Welcome! Setting up..." if org missing
+- metadataBase uses NEXT_PUBLIC_SITE_URL env or localhost:3000
+- images config uses remotePatterns (more secure than domains)
+
+## Timestamp: 2025-11-05T00:16:00Z
+## Steps Completed: 4 (Validation)
+## Summary:
+All implementation complete. Dev server starts without warnings. Bug fix ready for testing with actual Google OAuth flow.
+
+### Status: COMPLETE
+- ✓ Auth callback creates user/org for new OAuth users
+- ✓ Projects page handles missing org gracefully
+- ✓ metadataBase warning resolved
+- ✓ images.domains deprecation warning resolved
+- ✓ Code compiles without errors

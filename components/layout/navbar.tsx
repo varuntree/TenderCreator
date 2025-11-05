@@ -74,6 +74,10 @@ const Navbar = ({
     '/docs',
     '/not-found',
     '/forgot-password',
+    '/dashboard',
+    '/organization',
+    '/projects',
+    '/settings',
   ].some((route) => pathname.includes(route));
 
   useEffect(() => {

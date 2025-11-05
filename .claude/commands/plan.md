@@ -166,6 +166,12 @@ Execute every command to validate the phase works correctly.
 
 <list commands you'll use to validate the phase is implemented correctly. every command must execute without errors. Include commands to validate the phase end-to-end.>
 
+
+<list commands you'll use to validate with 100% confidence the feature is implemented correctly with zero regressions. every command must execute without errors so be specific about what you want to run to validate the feature works as expected. Include commands to test the feature end-to-end.>
+
+<If you created an E2E test, include the following validation step: `Read .claude/commands/test_e2e.md`, then read and execute your new E2E `.claude/commands/e2e/test_<descriptive_name>.md` test file to validate this functionality works.>
+
+
 # Implementation log created at:
 # {plan_directory}/{phase_name}_implementation.log
 

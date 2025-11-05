@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import Image, { type StaticImageData } from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
-import commandVisual from '/public/images/f1.png';
-import embedVisual from '/public/images/f2.png';
-import rerankVisual from '/public/images/f3.png';
+import commandVisual from '@/public/images/f1.png';
+import embedVisual from '@/public/images/f2.png';
+import rerankVisual from '@/public/images/f3.png';
 import usePrefersReducedMotion from '@/hooks/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
 

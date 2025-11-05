@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
     default: 'TenderCreator - AI-Powered Tender Response Automation',
     template: '%s | TenderCreator',
