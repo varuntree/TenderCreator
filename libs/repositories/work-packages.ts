@@ -15,7 +15,7 @@ export interface WorkPackage {
   document_description: string | null
   requirements: Requirement[]
   assigned_to: string | null
-  status: 'pending' | 'in_progress' | 'review' | 'completed'
+  status: 'not_started' | 'in_progress' | 'completed'
   order: number
   created_at: string
   updated_at: string
@@ -27,14 +27,14 @@ export interface CreateWorkPackageData {
   document_description?: string | null
   requirements?: Requirement[]
   order?: number
-  status?: 'pending' | 'in_progress' | 'review' | 'completed'
+  status?: 'not_started' | 'in_progress' | 'completed'
 }
 
 export interface UpdateWorkPackageData {
   document_type?: string
   document_description?: string | null
   requirements?: Requirement[]
-  status?: 'pending' | 'in_progress' | 'review' | 'completed'
+  status?: 'not_started' | 'in_progress' | 'completed'
   assigned_to?: string | null
 }
 
@@ -53,7 +53,7 @@ export async function createWorkPackage(
       document_description: data.document_description || null,
       requirements: data.requirements || [],
       order: data.order || 0,
-      status: data.status || 'pending',
+      status: data.status || 'not_started',
     })
     .select()
     .single()
@@ -155,5 +155,81 @@ export async function deleteWorkPackage(
 
   if (error) {
     throw new Error(`Failed to delete work package: ${error.message}`)
+  }
+}
+
+/**
+ * Update work package assignment
+ */
+export async function updateWorkPackageAssignment(
+  supabase: SupabaseClient,
+  workPackageId: string,
+  userId: string
+): Promise<WorkPackage> {
+  const { data: workPackage, error } = await supabase
+    .from('work_packages')
+    .update({
+      assigned_to: userId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', workPackageId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to update work package assignment: ${error.message}`)
+  }
+
+  return workPackage
+}
+
+/**
+ * Update work package status
+ */
+export async function updateWorkPackageStatus(
+  supabase: SupabaseClient,
+  workPackageId: string,
+  status: 'not_started' | 'in_progress' | 'completed'
+): Promise<WorkPackage> {
+  const { data: workPackage, error } = await supabase
+    .from('work_packages')
+    .update({
+      status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', workPackageId)
+    .select()
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to update work package status: ${error.message}`)
+  }
+
+  return workPackage
+}
+
+/**
+ * Get work package with project info
+ */
+export async function getWorkPackageWithProject(
+  supabase: SupabaseClient,
+  workPackageId: string
+): Promise<{ workPackage: WorkPackage; project: any }> {
+  const { data: workPackage, error } = await supabase
+    .from('work_packages')
+    .select(`
+      *,
+      project:projects(*)
+    `)
+    .eq('id', workPackageId)
+    .single()
+
+  if (error) {
+    throw new Error(`Failed to get work package with project: ${error.message}`)
+  }
+
+  return {
+    workPackage: workPackage,
+    project: workPackage.project,
   }
 }

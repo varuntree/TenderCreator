@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react'
 
 import { AnalysisTrigger } from '@/components/analysis-trigger'
 import DocumentList from '@/components/document-list'
-import { DocumentRequirementsMatrix } from '@/components/document-requirements-matrix'
 import FileUpload from '@/components/file-upload'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { WorkPackageDashboard } from '@/components/work-package-dashboard'
 
 interface WorkPackage {
   id: string
@@ -148,8 +148,8 @@ export default function ProjectDetailPage() {
           </>
         )}
 
-        {project.status === 'in_progress' && workPackages.length > 0 && (
-          <DocumentRequirementsMatrix
+        {project.status === 'in_progress' && (
+          <WorkPackageDashboard
             projectId={projectId}
             workPackages={workPackages}
             onUpdate={loadData}

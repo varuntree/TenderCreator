@@ -114,7 +114,7 @@ export async function POST(
                 document_description: doc.description,
                 requirements: doc.requirements,
                 order: i,
-                status: 'pending',
+                status: 'not_started',
               })
 
               sendEvent('document', workPackage)

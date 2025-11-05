@@ -231,6 +231,15 @@
   .section-padding {
     @apply py-17 md:py-24 lg:py-28;
   }
+
+  .card-hover {
+    transition: all 200ms ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
 }
 
 @utility font-weight-display {
