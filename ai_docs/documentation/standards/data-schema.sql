@@ -17,7 +17,7 @@ CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     settings JSONB NOT NULL DEFAULT '{
-        "ai_model": "gemini-2.5-flash",
+        "ai_model": "gemini-2.0-flash-exp",
         "default_tone": "professional"
     }'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -220,7 +220,7 @@ CREATE TABLE ai_interactions (
 
     -- Context Used
     context_tokens INTEGER,
-    model TEXT NOT NULL DEFAULT 'gemini-2.5-flash',
+    model TEXT NOT NULL DEFAULT 'gemini-2.0-flash-exp',
 
     -- Error tracking
     error BOOLEAN DEFAULT FALSE,
@@ -343,7 +343,7 @@ CREATE POLICY "Users can view AI interactions in their organization"
 /*
 -- organizations.settings example:
 {
-    "ai_model": "gemini-2.5-flash",
+    "ai_model": "gemini-2.0-flash-exp",
     "default_tone": "professional"
 }
 

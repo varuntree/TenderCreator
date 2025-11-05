@@ -22,30 +22,34 @@ export async function extractTextFromFile(
       displayName: fileName,
     })
 
-  try {
-    // Extract text with prompt
-    const result = await model.generateContent([
-      {
-        fileData: {
-          mimeType: uploadResult.file.mimeType,
-          fileUri: uploadResult.file.uri,
-        },
-      },
-      {
-        text: `Extract all text content from this document. Return only the plain text, preserving structure and paragraphs. Do not add any commentary or explanation.`,
-      },
-    ])
-
-    const response = await result.response
-    const text = response.text()
-
-    return text
-  } finally {
-    // Always clean up uploaded file
     try {
-      await fileManager.deleteFile(uploadResult.file.name)
-    } catch (cleanupError) {
-      console.error('Failed to delete uploaded file:', cleanupError)
+      // Extract text with prompt
+      const result = await model.generateContent([
+        {
+          fileData: {
+            mimeType: uploadResult.file.mimeType,
+            fileUri: uploadResult.file.uri,
+          },
+        },
+        {
+          text: `Extract all text content from this document. Return only the plain text, preserving structure and paragraphs. Do not add any commentary or explanation.`,
+        },
+      ])
+
+      const response = await result.response
+      const text = response.text()
+
+      return text
+    } finally {
+      // Always clean up uploaded file
+      try {
+        await fileManager.deleteFile(uploadResult.file.name)
+      } catch (cleanupError) {
+        console.error('Failed to delete uploaded file:', cleanupError)
+      }
     }
+  } catch (error) {
+    console.error('Text extraction error:', error)
+    return ''
   }
 }

@@ -90,7 +90,7 @@ metadata: <JSON string>
 
 ### Model Configuration
 
-**Single Model:** `gemini-2.5-flash` for all operations
+**Single Model:** `gemini-2.0-flash-exp` for all operations
 
 **API Client Location:** `/libs/ai/client.ts`
 

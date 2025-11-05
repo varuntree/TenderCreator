@@ -200,7 +200,7 @@ GEMINI_API_KEY=<from ai.google.dev>
 ### 8. Create Gemini AI Client
 
 - `libs/ai/client.ts` - Initialize Gemini client with API key
-- Export configured `model` instance (gemini-2.5-flash)
+- Export configured `model` instance (gemini-2.0-flash-exp)
 
 ### 9. Implement Text Extraction Function
 

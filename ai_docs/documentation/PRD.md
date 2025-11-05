@@ -156,7 +156,7 @@ type Organization = {
 
   // Settings
   settings: {
-    ai_model: 'gemini-2.5-flash' // Fixed for MVP
+    ai_model: 'gemini-2.0-flash-exp' // Fixed for MVP
     default_tone: string // 'professional' | 'technical' | 'conversational'
   }
 }
@@ -303,7 +303,7 @@ type AIInteraction = {
 
   // Context Used
   context_tokens: number
-  model: 'gemini-2.5-flash'
+  model: 'gemini-2.0-flash-exp'
 
   created_at: timestamp
 }
