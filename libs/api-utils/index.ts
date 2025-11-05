@@ -88,10 +88,8 @@ export function withAuth(handler: AuthHandler) {
         return apiError('Unauthorized', 401)
       }
 
-      // Next.js 15: params are now Promise objects, must await them
-      const resolvedParams = context?.params ? await context.params : undefined
-
-      return handler(request, { user, supabase }, resolvedParams)
+      // Next.js 15: params are now Promise objects, pass context as is
+      return handler(request, { user, supabase }, context)
     } catch (error) {
       console.error('Auth handler error:', error)
       return apiError(error as Error)

@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { ChevronDown, ChevronRight, Plus,Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -217,9 +218,8 @@ export function DocumentRequirementsMatrix({
             {workPackages.map((wp) => {
               const isExpanded = expandedRows.has(wp.id)
               return (
-                <>
+                <React.Fragment key={wp.id}>
                   <TableRow
-                    key={wp.id}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => toggleRow(wp.id)}
                   >
@@ -312,7 +312,7 @@ export function DocumentRequirementsMatrix({
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </React.Fragment>
               )
             })}
           </TableBody>
