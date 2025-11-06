@@ -1,5 +1,3 @@
-import { WorkPackage } from '@/libs/repositories/work-packages'
-
 /**
  * Progress tracking for bulk document generation
  */
@@ -149,6 +147,14 @@ export async function generateSingleDocument(workPackageId: string): Promise<voi
 }
 
 /**
+ * Work package interface (minimal fields needed for bulk generation)
+ */
+export interface BulkGenerationWorkPackage {
+  id: string
+  status: 'pending' | 'in_progress' | 'completed'
+}
+
+/**
  * Generate multiple work packages in parallel
  *
  * @param workPackages - Array of work packages to generate
@@ -156,7 +162,7 @@ export async function generateSingleDocument(workPackageId: string): Promise<voi
  * @returns Result containing succeeded, failed, and skipped work packages
  */
 export async function bulkGenerateDocuments(
-  workPackages: WorkPackage[],
+  workPackages: BulkGenerationWorkPackage[],
   onProgress?: (progress: BulkGenerationProgress[]) => void
 ): Promise<BulkGenerationResult> {
   // Filter out already completed work packages

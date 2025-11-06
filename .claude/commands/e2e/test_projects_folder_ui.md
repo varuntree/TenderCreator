@@ -32,9 +32,9 @@ Verify: "Create Project" button visible in header
 ### 3. Verify Folder-Shaped Cards
 ```
 Observe project cards in grid layout
-Verify: Each card has folder tab at top (not rectangular)
-Verify: Folder tab contains folder icon and project name
-Verify: Folder body below tab contains metadata
+Verify: Each card has a sculpted folder tab at top (not rectangular)
+Verify: Folder tab contains a folder icon and "Project" label
+Verify: Folder body below tab contains the project name and metadata
 Verify: Cards are NOT plain rectangles (clip-path applied)
 Take screenshot: "projects-folder-grid.png"
 ```
@@ -57,13 +57,13 @@ Take screenshot: "projects-color-variants.png"
 For each project card, verify:
   - Folder tab section:
     - Folder icon visible (lucide-react)
-    - Project name displayed and readable
-    - Text truncates if name too long
+    - Label reads "Project"
   - Folder body section:
-    - Status badge in top-right (outline style, semi-transparent background)
+    - Project name displayed near top-left (line-clamp-2)
+    - Status badge in top-right (pill with translucent background)
     - Client name displayed (if exists)
-    - Deadline displayed (if exists)
-    - Format: "Due: MM/DD/YYYY"
+    - Deadline displayed (if exists) as `MM/DD/YYYY`
+    - Helper text appears if both client and deadline are missing
 ```
 
 ### 6. Test Hover Animations
@@ -129,7 +129,7 @@ If test account has zero projects:
 ### 11. Test Edge Cases
 ```
 Test with project with very long name:
-  Verify: Text truncates in folder tab
+  Verify: Line clamp keeps title to two lines inside body
   Verify: No overflow or layout break
 
 Test with project missing client_name:
@@ -141,7 +141,7 @@ Test with project missing deadline:
   Verify: Layout still looks good
 
 Test with project missing both:
-  Verify: Only status badge shows
+  Verify: Helper text appears about adding metadata
   Verify: Folder body not empty/broken
 ```
 
@@ -165,8 +165,8 @@ Verify all acceptance criteria met:
 - [ ] Folder tab visible at top of each card
 - [ ] Clip-path polygon creates folder shape (not rectangle)
 - [ ] Folder icon displayed in tab
-- [ ] Project name in tab section
-- [ ] Client, deadline, status in body section
+- [ ] Project name in body section (left-aligned)
+- [ ] Client, deadline, status (or helper text) in body section
 - [ ] 5 color variants rotate across projects
 - [ ] Colors are professional/subtle gradients
 - [ ] Status badge semi-transparent on gradient background
