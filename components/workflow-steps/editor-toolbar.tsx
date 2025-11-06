@@ -11,6 +11,7 @@ import {
   ListOrdered,
   Redo,
   RemoveFormatting,
+  Table as TableIcon,
   Undo,
 } from 'lucide-react'
 
@@ -111,6 +112,53 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         className="data-[active=true]:bg-muted"
       >
         <ListOrdered className="size-4" />
+      </Button>
+
+      <div className="w-px h-6 bg-border mx-1" />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        title="Insert Table"
+      >
+        <TableIcon className="size-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().addRowAfter().run()}
+        disabled={!editor.can().addRowAfter()}
+        title="Add Row"
+      >
+        Row+
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().deleteRow().run()}
+        disabled={!editor.can().deleteRow()}
+        title="Delete Row"
+      >
+        Row-
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().addColumnAfter().run()}
+        disabled={!editor.can().addColumnAfter()}
+        title="Add Column"
+      >
+        Col+
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().deleteColumn().run()}
+        disabled={!editor.can().deleteColumn()}
+        title="Delete Column"
+      >
+        Col-
       </Button>
 
       <div className="w-px h-6 bg-border mx-1" />

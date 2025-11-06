@@ -1,12 +1,12 @@
 'use client'
 
+import type { LucideIcon } from 'lucide-react'
 import {
   BookOpen,
   Building2,
   ChevronLeft,
   CreditCard,
   FileQuestion,
-  FileText,
   Home,
   Plus,
   Settings,
@@ -20,13 +20,53 @@ import Logo from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-const navItems = [
-  { id: 'home', name: 'Home', href: '/projects', icon: Home },
-  { id: 'company', name: 'Company', href: '/settings', icon: Building2 },
-  { id: 'tenders', name: 'Tenders', href: '/projects', icon: FileText },
-  { id: 'team', name: 'Team', href: '/settings/team', icon: Users },
-  { id: 'billing', name: 'Billing', href: '/settings/billing', icon: CreditCard },
-  { id: 'settings', name: 'Settings', href: '/settings', icon: Settings },
+type NavItem = {
+  id: string
+  name: string
+  href: string
+  icon: LucideIcon
+  match?: (pathname: string) => boolean
+}
+
+const navItems: NavItem[] = [
+  {
+    id: 'home',
+    name: 'Home',
+    href: '/projects',
+    icon: Home,
+    match: (pathname) => pathname === '/projects',
+  },
+  {
+    id: 'company',
+    name: 'Company',
+    href: '/settings',
+    icon: Building2,
+    match: (pathname) => pathname === '/settings',
+  },
+  {
+    id: 'team',
+    name: 'Team',
+    href: '/settings/team',
+    icon: Users,
+    match: (pathname) => pathname === '/settings/team',
+  },
+  {
+    id: 'billing',
+    name: 'Billing',
+    href: '/settings/billing',
+    icon: CreditCard,
+    match: (pathname) => pathname === '/settings/billing',
+  },
+  {
+    id: 'settings',
+    name: 'Settings',
+    href: '/settings/documents',
+    icon: Settings,
+    match: (pathname) =>
+      pathname.startsWith('/settings/') &&
+      pathname !== '/settings/team' &&
+      pathname !== '/settings/billing',
+  },
   { id: 'resources', name: 'Useful Resources', href: '/resources', icon: BookOpen },
   { id: 'docs', name: 'Documentation', href: '/docs', icon: FileQuestion },
 ]
@@ -46,19 +86,13 @@ export default function Sidebar() {
     localStorage.setItem('sidebarCollapsed', String(newState))
   }
 
-  const isActive = (item: { id: string; href: string }) => {
-    // For /projects route, only show Home as active (not Tenders)
-    if (item.href === '/projects') {
-      const isProjectsRoute = pathname === '/projects' || pathname.startsWith('/projects/')
-      return item.id === 'home' && isProjectsRoute
+  const isActive = (item: NavItem) => {
+    // Use custom match function if provided
+    if (item.match) {
+      return item.match(pathname)
     }
-    // For /settings, prioritize more specific routes
-    if (item.href === '/settings') {
-      // Show active for Settings only if on exactly /settings or /settings/documents
-      return pathname === '/settings' || pathname === '/settings/documents'
-    }
-    // For other routes, check if path starts with href
-    return pathname.startsWith(item.href)
+    // Fallback to exact match for items without custom match
+    return pathname === item.href
   }
 
   return (

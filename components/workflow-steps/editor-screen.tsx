@@ -20,8 +20,8 @@ export function EditorScreen({
   onBack,
 }: EditorScreenProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex h-full flex-col gap-6 overflow-hidden">
+      <div className="flex flex-shrink-0 items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Edit Document</h2>
           <p className="text-muted-foreground">Refine and customize your content</p>
@@ -37,7 +37,7 @@ export function EditorScreen({
         initialContent={initialContent}
       />
 
-      <div className="flex justify-start pt-4">
+      <div className="flex flex-shrink-0 justify-start pt-4">
         <Button variant="outline" onClick={onBack}>
           <ChevronLeft className="mr-2 size-4" />
           Back to Generate

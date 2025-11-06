@@ -6,7 +6,7 @@ export interface WorkPackageContent {
   id: string
   work_package_id: string
   content: string | null
-  content_json: any
+  content_json?: any
   created_at: string
   updated_at: string
 }

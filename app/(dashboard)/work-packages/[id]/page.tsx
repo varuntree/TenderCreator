@@ -74,6 +74,33 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
     }
   }, [workPackageId, loadData])
 
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    const main = document.querySelector('main')
+
+    const previousHtmlOverflow = html.style.overflow
+    const previousBodyOverflow = body.style.overflow
+    const previousBodyHeight = body.style.height
+    const previousMainOverflow = main instanceof HTMLElement ? main.style.overflow : null
+
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    body.style.height = '100vh'
+    if (main instanceof HTMLElement) {
+      main.style.overflow = 'hidden'
+    }
+
+    return () => {
+      html.style.overflow = previousHtmlOverflow
+      body.style.overflow = previousBodyOverflow
+      body.style.height = previousBodyHeight
+      if (main instanceof HTMLElement && previousMainOverflow !== null) {
+        main.style.overflow = previousMainOverflow
+      }
+    }
+  }, [])
+
   const getCompletedSteps = () => {
     const steps = ['requirements']
     if (content?.win_themes && Array.isArray(content.win_themes) && content.win_themes.length > 0) {
@@ -105,14 +132,15 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
   }
 
   return (
-    <div className="container max-w-5xl py-8">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-hidden">
+      <div className="mx-auto flex h-full max-w-5xl flex-1 flex-col py-8">
       <WorkflowTabs
-        workPackageId={workPackageId}
         currentTab={currentTab}
         onTabChange={(tab: string) => setCurrentTab(tab as typeof currentTab)}
         completedSteps={getCompletedSteps()}
+        className="flex flex-1 min-h-0 flex-col overflow-hidden"
       >
-        <TabsContent value="requirements">
+        <TabsContent value="requirements" className="flex flex-1 flex-col overflow-auto">
           <RequirementsView
             workPackage={workPackage}
             projectId={project.id}
@@ -120,7 +148,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
 
-        <TabsContent value="strategy">
+        <TabsContent value="strategy" className="flex flex-1 flex-col overflow-auto">
           <StrategyScreen
             workPackageId={workPackageId}
             initialWinThemes={content?.win_themes as string[] | undefined}
@@ -129,7 +157,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
 
-        <TabsContent value="generate">
+        <TabsContent value="generate" className="flex flex-1 flex-col overflow-auto">
           <GenerationScreen
             workPackageId={workPackageId}
             workPackage={workPackage}
@@ -139,7 +167,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
 
-        <TabsContent value="edit">
+        <TabsContent value="edit" className="flex flex-1 flex-col overflow-hidden">
           <EditorScreen
             workPackageId={workPackageId}
             initialContent={(content?.content as string) || ''}
@@ -148,7 +176,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
 
-        <TabsContent value="export">
+        <TabsContent value="export" className="flex flex-1 flex-col overflow-auto">
           <ExportScreen
             workPackageId={workPackageId}
             workPackage={workPackage}
@@ -156,6 +184,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
       </WorkflowTabs>
+      </div>
     </div>
   )
 }

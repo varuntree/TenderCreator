@@ -2,14 +2,15 @@
 
 import { Check, Lock } from 'lucide-react'
 
-import { Tabs,TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 interface WorkflowTabsProps {
-  workPackageId: string
   currentTab: 'requirements' | 'strategy' | 'generate' | 'edit' | 'export'
   onTabChange: (tab: string) => void
   completedSteps: string[]
   children: React.ReactNode
+  className?: string
 }
 
 export function WorkflowTabs({
@@ -17,6 +18,7 @@ export function WorkflowTabs({
   onTabChange,
   completedSteps,
   children,
+  className,
 }: WorkflowTabsProps) {
   const tabs = [
     { id: 'requirements', label: 'Requirements' },
@@ -32,7 +34,11 @@ export function WorkflowTabs({
   }
 
   return (
-    <Tabs value={currentTab} onValueChange={onTabChange} className="w-full">
+    <Tabs
+      value={currentTab}
+      onValueChange={onTabChange}
+      className={cn('w-full', className)}
+    >
       <TabsList className="w-full">
         {tabs.map(tab => (
           <TabsTrigger
