@@ -58,14 +58,23 @@ export async function generateBidAnalysis(
     }
 
     // Calculate weighted scores and total
-    const criteria = parsed.criteria.map((c: any, index: number) => ({
-      id: String(index + 1),
-      name: c.name,
-      description: c.description,
-      score: parseFloat(c.score) || 0,
-      weight: 0.167, // Equal weight for all 6 criteria
-      weightedScore: (parseFloat(c.score) || 0) * 0.167,
-    }))
+    const totalCriteria = parsed.criteria.length || 1
+
+    const criteria = parsed.criteria.map((c: any, index: number) => {
+      const parsedScore = typeof c.score === 'number' ? c.score : parseFloat(c.score) || 0
+      const clampedScore = Math.max(0, Math.min(5, parsedScore))
+      const weight = 1 / totalCriteria
+      const weightedScore = (clampedScore / 5) * weight
+
+      return {
+        id: String(index + 1),
+        name: c.name,
+        description: c.description,
+        score: clampedScore,
+        weight,
+        weightedScore,
+      }
+    })
 
     const totalScore = Math.round(
       criteria.reduce((sum: number, c: AssessmentCriterion) => sum + c.weightedScore, 0) * 100

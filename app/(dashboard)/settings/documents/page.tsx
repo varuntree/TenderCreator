@@ -7,6 +7,7 @@ import DocumentList from '@/components/document-list'
 import { EmptyState } from '@/components/empty-state'
 import FileUpload from '@/components/file-upload'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 export default function OrganizationDocumentsPage() {
   const [documents, setDocuments] = useState<{id: string; name: string; file_type: string; file_size: number; uploaded_at: string}[]>([])
@@ -76,7 +77,9 @@ export default function OrganizationDocumentsPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p>Loading...</p>
+              <div className="flex min-h-[120px] items-center justify-center">
+                <LoadingSpinner text="Loading documents..." />
+              </div>
             ) : documents.length === 0 ? (
               <EmptyState
                 icon={Upload}

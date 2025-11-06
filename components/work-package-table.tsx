@@ -1,10 +1,11 @@
 'use client'
 
-import { Circle, CircleCheck, CircleDot, Loader2 } from 'lucide-react'
+import { Circle, CircleCheck, CircleDot } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/loading-spinner'
 import {
   Select,
   SelectContent,
@@ -193,7 +194,7 @@ export function WorkPackageTable({
           size="lg"
           className="gap-2"
         >
-          {isGenerating && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isGenerating && <Spinner size="sm" className="text-muted-foreground" />}
           {allCompleted
             ? "All Documents Generated"
             : `Generate All Documents (${pendingCount})`
@@ -245,7 +246,7 @@ export function WorkPackageTable({
                   <TableCell>
                     {isDocGenerating ? (
                       <div className="flex items-center gap-2 text-primary">
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Spinner size="sm" />
                         <TextShimmer className="text-sm font-semibold tracking-wide" duration={1.2}>
                           {LOADING_MESSAGES[messageIndex]}
                         </TextShimmer>

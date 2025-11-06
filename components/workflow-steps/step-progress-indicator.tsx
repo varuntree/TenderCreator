@@ -23,38 +23,38 @@ export function StepProgressIndicator({ steps, className }: StepProgressIndicato
   if (!steps?.length) return null
 
   return (
-    <nav className={cn('w-full py-4', className)} aria-label="Workflow progress">
-      <ol className="flex items-start gap-2">
-        {steps.map((step, index) => {
-          const isLast = index === steps.length - 1
-          const isActive = step.status === 'active'
+    <nav className={cn('w-full py-2', className)} aria-label="Workflow progress">
+      <ol className="grid w-full grid-cols-3 items-center gap-6">
+        {steps.map(step => {
           const isComplete = step.status === 'complete'
+          const isActive = step.status === 'active'
+          const isUpcoming = step.status === 'upcoming'
+          const barColor = isComplete
+            ? 'bg-emerald-600'
+            : isActive
+              ? 'bg-emerald-500'
+              : 'bg-slate-200'
+          const textColor = isComplete
+            ? 'text-emerald-700'
+            : isActive
+              ? 'text-emerald-600'
+              : 'text-slate-400'
 
           return (
-            <li
-              key={step.key}
-              className={cn('flex-1 flex flex-col', isLast && 'flex-none w-auto')}
-              aria-current={isActive ? 'step' : undefined}
-            >
-              {/* Progress bar */}
-              {!isLast && (
-                <div
+            <li key={step.key} aria-current={isActive ? 'step' : undefined}>
+              <div className="flex w-full flex-col gap-2">
+                <div className={cn('h-2 rounded-full transition-all duration-300', barColor)} />
+                <p
                   className={cn(
-                    'h-2.5 rounded-full transition-all duration-300 w-full',
-                    isComplete || isActive ? 'bg-emerald-500' : 'bg-gray-200'
+                    'text-sm font-semibold tracking-tight',
+                    textColor,
+                    isUpcoming && 'font-medium'
                   )}
-                />
-              )}
-
-              {/* Step label */}
-              <p
-                className={cn(
-                  'text-sm font-medium transition-colors mt-3 whitespace-nowrap',
-                  isComplete || isActive ? 'text-gray-900' : 'text-gray-400'
-                )}
-              >
-                {step.order}. {step.title}
-              </p>
+                >
+                  <span className="mr-1">{step.order}.</span>
+                  {step.title}
+                </p>
+              </div>
             </li>
           )
         })}

@@ -7,7 +7,7 @@ import {
   ChevronLeft,
   CreditCard,
   FileQuestion,
-  Home,
+  FolderKanban,
   Plus,
   Settings,
   Users,
@@ -31,11 +31,11 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    id: 'home',
-    name: 'Home',
+    id: 'projects',
+    name: 'Projects',
     href: '/projects',
-    icon: Home,
-    match: (pathname) => pathname === '/projects',
+    icon: FolderKanban,
+    match: (pathname) => pathname === '/projects' || pathname === '/',
   },
   {
     id: 'company',

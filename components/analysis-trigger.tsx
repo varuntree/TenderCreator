@@ -1,10 +1,10 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/loading-spinner'
 
 import { StreamingProgress } from './streaming-progress'
 
@@ -105,7 +105,7 @@ export function AnalysisTrigger({
         size="lg"
         className="w-full sm:w-auto"
       >
-        {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isAnalyzing && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
         Analyze RFT
       </Button>
     </>

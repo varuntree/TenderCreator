@@ -9,6 +9,7 @@ import OrganizationProfileForm from '@/components/organization-profile-form'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Organization } from '@/types/organization'
 
 export default function SettingsPage() {
@@ -39,7 +40,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+        <LoadingSpinner text="Loading organization..." />
       </div>
     )
   }

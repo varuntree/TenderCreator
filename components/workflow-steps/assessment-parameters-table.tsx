@@ -46,7 +46,7 @@ export function AssessmentParametersTable({
   className,
 }: AssessmentParametersTableProps) {
   const formatPercentage = (decimal: number) => `${(decimal * 100).toFixed(1)}%`
-  const formatScore = (score: number) => `${score} / 5`
+  const formatScore = (score: number) => `${score.toFixed(1)} / 5`
 
   return (
     <Card className={cn('', className)}>
@@ -125,7 +125,7 @@ export function AssessmentParametersTable({
                     {formatPercentage(criterion.weight)}
                   </TableCell>
                   <TableCell className="py-4 text-sm font-medium">
-                    {criterion.weightedScore.toFixed(2)}
+                    {formatPercentage(criterion.weightedScore)}
                   </TableCell>
                 </TableRow>
               ))}

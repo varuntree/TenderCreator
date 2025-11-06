@@ -1,10 +1,11 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, Loader2 } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { Spinner } from '@/components/ui/loading-spinner'
 import { cn } from '@/lib/utils'
 
 export type ProcessLoaderStep = {
@@ -192,7 +193,7 @@ function StepIndicator({ status }: { status: 'pending' | 'active' | 'complete' }
   if (status === 'active') {
     return (
       <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-emerald-500">
-        <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-600" strokeWidth={2.4} />
+        <Spinner size="sm" className="h-3.5 w-3.5 text-emerald-600" strokeWidth={2.4} />
       </span>
     )
   }

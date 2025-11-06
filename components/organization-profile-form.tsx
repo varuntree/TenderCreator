@@ -1,6 +1,6 @@
 'use client'
 
-import { ImageIcon, Loader2 } from 'lucide-react'
+import { ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/loading-spinner'
 import { Organization } from '@/types/organization'
 
 interface OrganizationProfileFormProps {
@@ -156,7 +157,7 @@ export default function OrganizationProfileForm({
       <Button type="submit" disabled={loading}>
         {loading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Spinner size="sm" className="mr-2 text-primary-foreground" />
             Updating...
           </>
         ) : (

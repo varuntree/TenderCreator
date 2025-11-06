@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, Plus, Sparkles } from 'lucide-react'
+import { Plus, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/loading-spinner'
 import { Textarea } from '@/components/ui/textarea'
 
 interface Requirement {
@@ -193,7 +194,7 @@ export function AddDocumentDialog({
             >
               {isSearching ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Spinner size="sm" className="mr-2 text-primary-foreground" />
                   Searching...
                 </>
               ) : (
@@ -249,7 +250,7 @@ export function AddDocumentDialog({
             onClick={handleSave}
             disabled={!workPackageId || isCreating}
           >
-            {isCreating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {isCreating && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
             Add Document
           </Button>
         </DialogFooter>

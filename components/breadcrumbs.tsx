@@ -5,15 +5,15 @@ import { usePathname } from 'next/navigation'
 
 // Route to display name mapping
 const getPageName = (pathname: string): string => {
-  if (pathname === '/projects' || pathname === '/') return 'Home'
-  if (pathname.startsWith('/projects/')) return 'Project'
+  if (pathname === '/projects' || pathname === '/') return 'Projects'
+  if (pathname.startsWith('/projects/')) return 'Project Workspace'
   if (pathname === '/settings') return 'Settings'
   if (pathname === '/settings/documents') return 'Documents'
   if (pathname === '/settings/team') return 'Team'
   if (pathname === '/settings/billing') return 'Billing'
   if (pathname === '/resources') return 'Resources'
   if (pathname === '/docs') return 'Documentation'
-  return 'Home'
+  return 'Projects'
 }
 
 export default function Breadcrumbs() {
