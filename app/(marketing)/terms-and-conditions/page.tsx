@@ -29,7 +29,7 @@ export default async function TermsOfService() {
   // Read the MDX file
   const filePath = join(
     process.cwd(),
-    './app/terms-and-conditions/index.mdx',
+    './app/(marketing)/terms-and-conditions/index.mdx',
   );
   const source = readFileSync(filePath, 'utf8');
 

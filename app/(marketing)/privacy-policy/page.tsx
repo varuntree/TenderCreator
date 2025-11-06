@@ -27,7 +27,7 @@ const components = {
 
 export default async function PrivacyPolicy() {
   // Read the MDX file
-  const filePath = join(process.cwd(), './app/privacy-policy/index.mdx');
+  const filePath = join(process.cwd(), './app/(marketing)/privacy-policy/index.mdx');
   const source = readFileSync(filePath, 'utf8');
 
   // Compile the MDX content

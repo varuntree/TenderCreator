@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 // Route to display name mapping
 const getPageName = (pathname: string): string => {
   if (pathname === '/projects' || pathname === '/') return 'Home'
-  if (pathname.startsWith('/projects/new')) return 'Create New Tender'
   if (pathname.startsWith('/projects/')) return 'Project'
   if (pathname === '/settings') return 'Settings'
   if (pathname === '/settings/documents') return 'Documents'

@@ -30,7 +30,6 @@ export function AnalysisTrigger({
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true)
-    setDocuments([])
 
     try {
       const response = await fetch(`/api/projects/${projectId}/analyze`, {
@@ -96,24 +95,19 @@ export function AnalysisTrigger({
 
   const isDisabled = projectStatus !== 'setup' || isAnalyzing
 
-  if (isAnalyzing) {
-    return (
-      <StreamingProgress
-        isAnalyzing={isAnalyzing}
-        documents={documents}
-      />
-    )
-  }
-
   return (
-    <Button
-      onClick={handleAnalyze}
-      disabled={isDisabled}
-      size="lg"
-      className="w-full sm:w-auto"
-    >
-      {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Analyze RFT
-    </Button>
+    <>
+      <StreamingProgress isAnalyzing={isAnalyzing} documents={documents} />
+
+      <Button
+        onClick={handleAnalyze}
+        disabled={isDisabled}
+        size="lg"
+        className="w-full sm:w-auto"
+      >
+        {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Analyze RFT
+      </Button>
+    </>
   )
 }

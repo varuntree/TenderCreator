@@ -1,10 +1,9 @@
 import { FolderOpen } from 'lucide-react'
-import Link from 'next/link'
 
+import { CreateProjectDialog } from '@/components/create-project-dialog'
 import { EmptyState } from '@/components/empty-state'
 import FolderProjectCard from '@/components/folder-project-card'
-import { Button } from '@/components/ui/button'
-import { getOrganizationByUserId,listProjects } from '@/libs/repositories'
+import { getOrganizationByUserId, listProjects } from '@/libs/repositories'
 import { createClient } from '@/libs/supabase/server'
 
 export default async function ProjectsPage() {
@@ -36,11 +35,9 @@ export default async function ProjectsPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">Projects</h1>
-        <Link href="/projects/new">
-          <Button>Create Project</Button>
-        </Link>
+        <CreateProjectDialog />
       </div>
 
       {projects.length === 0 ? (

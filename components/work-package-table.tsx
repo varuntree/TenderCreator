@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { TextShimmer } from '@/components/ui/text-shimmer'
 import {
   Select,
   SelectContent,
@@ -21,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { TextShimmer } from '@/components/ui/text-shimmer'
 import { bulkGenerateDocuments } from '@/libs/utils/bulk-generation'
 
 interface WorkPackage {
@@ -63,7 +63,7 @@ const LOADING_MESSAGES = [
 export function WorkPackageTable({
   workPackages,
   onAssignmentChange,
-  onStatusChange,
+  onStatusChange: _onStatusChange,
   onOpen,
   onRefresh,
 }: WorkPackageTableProps) {

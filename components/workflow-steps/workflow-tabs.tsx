@@ -1,8 +1,7 @@
 'use client'
 
-import { Check, Lock } from 'lucide-react'
-
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs } from '@/components/ui/tabs'
+import { StepProgressIndicator } from '@/components/workflow-steps/step-progress-indicator'
 import { cn } from '@/lib/utils'
 
 interface WorkflowTabsProps {
@@ -20,16 +19,40 @@ export function WorkflowTabs({
   children,
   className,
 }: WorkflowTabsProps) {
-  const tabs = [
-    { id: 'requirements', label: 'Requirements' },
-    { id: 'strategy', label: 'Strategy & Generate' },
-    { id: 'edit', label: 'Edit' },
-    { id: 'export', label: 'Export' },
+  // Map workflow tabs to 5-step progress indicator
+  const steps = [
+    { id: 1, label: 'New Tender' },
+    { id: 2, label: 'Tender Planning' },
+    { id: 3, label: 'Tender Outline' },
+    { id: 4, label: 'Tender Content' },
+    { id: 5, label: 'Tender Export' },
   ]
 
-  const isTabAccessible = (tabId: string) => {
-    if (tabId === 'requirements') return true
-    return completedSteps.includes(tabId) || currentTab === tabId
+  // Map current tab to step number
+  const getCurrentStep = () => {
+    switch (currentTab) {
+      case 'requirements':
+        return 1
+      case 'strategy':
+        return 2
+      case 'edit':
+        return 4
+      case 'export':
+        return 5
+      default:
+        return 1
+    }
+  }
+
+  // Map completed tabs to step numbers
+  const getCompletedSteps = () => {
+    const stepMap: Record<string, number> = {
+      requirements: 1,
+      strategy: 2,
+      edit: 4,
+      export: 5,
+    }
+    return completedSteps.map(tab => stepMap[tab]).filter(Boolean)
   }
 
   return (
@@ -38,23 +61,16 @@ export function WorkflowTabs({
       onValueChange={onTabChange}
       className={cn('w-full flex flex-col', className)}
     >
-      <TabsList className="w-full flex-shrink-0">
-        {tabs.map(tab => (
-          <TabsTrigger
-            key={tab.id}
-            value={tab.id}
-            disabled={!isTabAccessible(tab.id)}
-            className="flex-1"
-          >
-            {completedSteps.includes(tab.id) ? (
-              <Check className="mr-1 size-4" />
-            ) : !isTabAccessible(tab.id) ? (
-              <Lock className="mr-1 size-4" />
-            ) : null}
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      {/* Step Progress Indicator */}
+      <div className="mb-8">
+        <StepProgressIndicator
+          currentStep={getCurrentStep()}
+          completedSteps={getCompletedSteps()}
+          steps={steps}
+        />
+      </div>
+
+      {/* Tab Content */}
       {children}
     </Tabs>
   )

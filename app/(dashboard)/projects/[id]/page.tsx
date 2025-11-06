@@ -78,15 +78,7 @@ export default function ProjectDetailPage() {
     }
   }
 
-  const handleDelete = async (docId: string) => {
-    if (!confirm('Delete this document?')) return
-
-    await fetch(`/api/projects/${projectId}/documents/${docId}`, {
-      method: 'DELETE',
-    })
-
-    await loadData()
-  }
+  // Removed unused handleDelete function
 
   const handleDeleteProject = async () => {
     if (!confirm('Delete this project?')) return

@@ -82,8 +82,8 @@ export async function POST(
     console.error('Content generation error:', error)
 
     // Check if this is a rate limit error
-    const isRateLimitError = (error as any).isRateLimitError || false
-    const retryDelaySeconds = (error as any).retryDelaySeconds || null
+    const isRateLimitError = (error as { isRateLimitError?: boolean }).isRateLimitError || false
+    const retryDelaySeconds = (error as { retryDelaySeconds?: number | null }).retryDelaySeconds || null
 
     return Response.json(
       {

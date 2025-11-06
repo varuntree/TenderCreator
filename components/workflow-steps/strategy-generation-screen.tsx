@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, ChevronRight, Edit, FileText, Loader2, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { Check, ChevronRight, ClipboardList, Edit, Loader2, Plus, Sparkles, Target, Trash2, Trophy } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -9,6 +9,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  AssessmentParametersTable,
+  getMockAssessmentCriteria,
+} from '@/components/workflow-steps/assessment-parameters-table'
+import {
+  BidRecommendationCard,
+  getMockBidRecommendation,
+} from '@/components/workflow-steps/bid-recommendation-card'
 import { WorkPackageContent } from '@/libs/repositories/work-package-content'
 import { Requirement, WorkPackage } from '@/libs/repositories/work-packages'
 
@@ -111,6 +120,11 @@ export function StrategyGenerationScreen({
     }
   }
 
+  // Mock data for assessment and bid recommendation
+  const assessmentCriteria = getMockAssessmentCriteria()
+  const bidRecommendation = getMockBidRecommendation()
+  const totalScore = 42 // Calculate from criteria
+
   // Show completion state
   if (isContentGenerated && isGeneratingContent === false && initialContent?.content) {
     return (
@@ -131,52 +145,99 @@ export function StrategyGenerationScreen({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Strategy & Content Generation</h2>
-        <p className="text-muted-foreground">
-          Review requirements and win themes, then generate your document
+        <h2 className="text-2xl md:text-3xl font-bold">Tender Planning</h2>
+        <p className="text-base text-muted-foreground">
+          Review requirements, assess bid decision, develop win strategy, and generate content
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Left Panel: Requirements & Win Themes */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Requirements Section */}
+      {/* Tab Navigation */}
+      <Tabs defaultValue="bid-decision" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+          <TabsTrigger value="requirements" className="flex items-center gap-2 py-3">
+            <ClipboardList className="size-4" />
+            <span>Requirements</span>
+          </TabsTrigger>
+          <TabsTrigger value="bid-decision" className="flex items-center gap-2 py-3">
+            <Target className="size-4" />
+            <span>Bid/No Bid</span>
+          </TabsTrigger>
+          <TabsTrigger value="win-strategy" className="flex items-center gap-2 py-3">
+            <Trophy className="size-4" />
+            <span>Win Strategy</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Tab 1: Requirements */}
+        <TabsContent value="requirements" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Requirements</CardTitle>
+              <CardTitle className="text-lg">Document Requirements</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Review the requirements identified for this {workPackage.document_type}
+              </p>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               {workPackage.requirements.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No requirements specified</p>
+                <p className="text-sm text-muted-foreground py-8 text-center">
+                  No requirements specified for this work package
+                </p>
               ) : (
-                workPackage.requirements.map((req: Requirement, idx: number) => (
-                  <div key={req.id} className="flex gap-3 text-sm">
-                    <span className="text-muted-foreground">{idx + 1}.</span>
-                    <div className="flex-1">
-                      <p>{req.text}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge
-                          variant={req.priority === 'mandatory' ? 'default' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {req.priority}
-                        </Badge>
-                        {req.source && (
-                          <span className="text-xs text-muted-foreground">{req.source}</span>
-                        )}
+                <div className="space-y-3">
+                  {workPackage.requirements.map((req: Requirement, idx: number) => (
+                    <div key={req.id} className="flex gap-3 p-4 border rounded-lg">
+                      <span className="text-muted-foreground font-medium">{idx + 1}.</span>
+                      <div className="flex-1 space-y-2">
+                        <p className="text-sm">{req.text}</p>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={req.priority === 'mandatory' ? 'destructive' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {req.priority}
+                          </Badge>
+                          {req.source && (
+                            <span className="text-xs text-muted-foreground">{req.source}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Win Themes Section */}
+        {/* Tab 2: Bid/No Bid Decision */}
+        <TabsContent value="bid-decision" className="mt-6 space-y-6">
+          {/* Assessment Parameters Table */}
+          <AssessmentParametersTable
+            criteria={assessmentCriteria}
+            totalScore={totalScore}
+            incumbentStatus="unknown"
+          />
+
+          {/* Bid Decision Recommendation */}
+          <BidRecommendationCard
+            recommendation={bidRecommendation.recommendation}
+            reasoning={bidRecommendation.reasoning}
+            strengths={bidRecommendation.strengths}
+            concerns={bidRecommendation.concerns}
+          />
+        </TabsContent>
+
+        {/* Tab 3: Win Strategy */}
+        <TabsContent value="win-strategy" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Win Themes</CardTitle>
+                <div>
+                  <CardTitle className="text-lg">Win Themes</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Identify 3-5 key messages that differentiate your proposal
+                  </p>
+                </div>
                 {winThemes.length > 0 && !isGeneratingThemes && (
                   <Button
                     size="sm"
@@ -185,7 +246,7 @@ export function StrategyGenerationScreen({
                     disabled={isGeneratingThemes}
                   >
                     <Sparkles className="mr-2 size-3" />
-                    Regenerate
+                    Regenerate All
                   </Button>
                 )}
               </div>
@@ -194,14 +255,14 @@ export function StrategyGenerationScreen({
               {isGeneratingThemes ? (
                 <LoadingSpinner size="sm" text="Generating win themes..." />
               ) : winThemes.length === 0 ? (
-                <div className="text-center py-4">
-                  <Sparkles className="mx-auto size-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-3">Generating win themes...</p>
+                <div className="text-center py-8">
+                  <Sparkles className="mx-auto size-8 text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground mb-4">Generating win themes...</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {winThemes.map((theme, index) => (
-                    <div key={index} className="border rounded-lg p-3">
+                    <div key={index} className="border rounded-lg p-4">
                       {editingIndex === index ? (
                         <div className="flex gap-2">
                           <Input
@@ -214,123 +275,118 @@ export function StrategyGenerationScreen({
                           </Button>
                         </div>
                       ) : (
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="flex-1 text-sm">{theme}</p>
-                          <div className="flex gap-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-2 flex-1">
+                            <div className="size-2 rounded-full bg-primary mt-2 shrink-0" />
+                            <p className="text-sm">{theme}</p>
+                          </div>
+                          <div className="flex gap-1 shrink-0">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleEdit(index)}
-                              className="h-7 w-7 p-0"
+                              className="h-8 w-8 p-0"
                             >
-                              <Edit className="size-3" />
+                              <Edit className="size-4" />
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleDelete(index)}
-                              className="h-7 w-7 p-0 text-destructive"
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                             >
-                              <Trash2 className="size-3" />
+                              <Trash2 className="size-4" />
                             </Button>
                           </div>
                         </div>
                       )}
                     </div>
                   ))}
-                  <Button variant="outline" onClick={handleAdd} size="sm" className="w-full">
-                    <Plus className="mr-2 size-3" />
-                    Add Win Theme
-                  </Button>
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" onClick={handleAdd} size="sm" className="flex-1">
+                      <Plus className="mr-2 size-4" />
+                      Add Win Theme
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
-        </div>
+        </TabsContent>
+      </Tabs>
 
-        {/* Right Panel: Content Generation */}
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Content Generation</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FileText className="size-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Document Type</p>
-                    <p className="text-sm text-muted-foreground">{workPackage.document_type}</p>
-                  </div>
-                </div>
+      {/* Content Generation Card - Always Visible */}
+      <Card className="border-2 border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-lg">Content Generation</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Ready to generate your {workPackage.document_type}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Document Type</p>
+              <p className="text-sm font-medium">{workPackage.document_type}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Requirements</p>
+              <Badge variant="outline">{workPackage.requirements.length} total</Badge>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Win Themes</p>
+              <Badge variant="outline">{winThemes.length} themes</Badge>
+            </div>
+          </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium mb-1">Requirements</p>
-                    <Badge variant="outline">{workPackage.requirements.length} total</Badge>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-1">Win Themes</p>
-                    <Badge variant="outline">{winThemes.length} themes</Badge>
-                  </div>
-                </div>
+          {isGeneratingContent && (
+            <Card className="bg-muted/50 border-muted">
+              <CardContent className="p-4">
+                <LoadingSpinner
+                  size="md"
+                  text="Generating content... This may take 1-2 minutes."
+                />
+              </CardContent>
+            </Card>
+          )}
 
-                <div className="border-t pt-4">
-                  <p className="text-sm text-muted-foreground">
-                    Estimated generation time: 2-3 minutes
-                  </p>
-                </div>
-              </div>
-
-              {isGeneratingContent && (
-                <Card className="bg-muted/50">
-                  <CardContent className="p-4">
-                    <LoadingSpinner
-                      size="md"
-                      text="Generating content... This may take 1-2 minutes."
-                    />
-                  </CardContent>
-                </Card>
+          <div className="space-y-3">
+            <Button
+              onClick={handleGenerateContent}
+              disabled={winThemes.length === 0 || isGeneratingContent || isGeneratingThemes}
+              size="lg"
+              className="w-full"
+            >
+              {isGeneratingContent ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 size-4" />
+                  Generate Content
+                </>
               )}
+            </Button>
+            {winThemes.length === 0 && !isGeneratingThemes && (
+              <p className="text-xs text-muted-foreground text-center">
+                Waiting for win themes to be generated...
+              </p>
+            )}
+            {initialContent?.content && !isGeneratingContent && (
+              <Button onClick={onContinue} variant="outline" size="lg" className="w-full">
+                Continue to Edit
+                <ChevronRight className="ml-2 size-4" />
+              </Button>
+            )}
+          </div>
 
-              <div className="pt-4">
-                <Button
-                  onClick={handleGenerateContent}
-                  disabled={winThemes.length === 0 || isGeneratingContent || isGeneratingThemes}
-                  size="lg"
-                  className="w-full"
-                >
-                  {isGeneratingContent ? (
-                    <>
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="mr-2 size-4" />
-                      Generate Content
-                    </>
-                  )}
-                </Button>
-                {winThemes.length === 0 && !isGeneratingThemes && (
-                  <p className="text-xs text-muted-foreground text-center mt-2">
-                    Waiting for win themes to be generated...
-                  </p>
-                )}
-              </div>
-
-              {initialContent?.content && !isGeneratingContent && (
-                <div className="pt-4 border-t">
-                  <Button onClick={onContinue} variant="outline" className="w-full">
-                    Continue to Edit
-                    <ChevronRight className="ml-2 size-4" />
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+          <div className="text-xs text-muted-foreground border-t pt-3">
+            <p>Estimated generation time: 2-3 minutes</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

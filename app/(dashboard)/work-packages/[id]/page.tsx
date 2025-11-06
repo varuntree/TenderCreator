@@ -103,14 +103,14 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
 
   return (
     <div className="flex h-screen w-full flex-1 flex-col overflow-hidden">
-      <div className="mx-auto flex h-full max-w-5xl flex-1 flex-col py-8">
+      <div className="mx-auto flex h-full max-w-7xl w-full flex-1 flex-col py-8 px-6">
       <WorkflowTabs
         currentTab={currentTab}
         onTabChange={(tab: string) => setCurrentTab(tab as typeof currentTab)}
         completedSteps={getCompletedSteps()}
         className="flex flex-1 flex-col min-h-0"
       >
-        <TabsContent value="requirements" className="flex flex-1 flex-col min-h-0 overflow-auto">
+        <TabsContent value="requirements" className="flex flex-1 flex-col min-h-0 overflow-auto px-2">
           <RequirementsView
             workPackage={workPackage}
             projectId={project.id}
@@ -118,7 +118,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
 
-        <TabsContent value="strategy" className="flex flex-1 flex-col min-h-0 overflow-auto">
+        <TabsContent value="strategy" className="flex flex-1 flex-col min-h-0 overflow-auto px-2">
           <StrategyGenerationScreen
             workPackageId={workPackageId}
             workPackage={workPackage}
@@ -137,7 +137,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           />
         </TabsContent>
 
-        <TabsContent value="export" className="flex flex-1 flex-col min-h-0 overflow-auto">
+        <TabsContent value="export" className="flex flex-1 flex-col min-h-0 overflow-auto px-2">
           <ExportScreen
             workPackageId={workPackageId}
             workPackage={workPackage}

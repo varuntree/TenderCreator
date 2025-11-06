@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { CreateProjectDialog } from '@/components/create-project-dialog'
 import Logo from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -109,28 +110,32 @@ export default function Sidebar() {
 
       {/* Create New Tender Button */}
       <div className={cn('mt-6 w-full', isCollapsed && 'flex justify-center')}>
-        {isCollapsed ? (
-          <Link
-            href="/projects/new"
-            className="flex h-10 w-10 items-center justify-center text-[#1EB472] transition-colors hover:text-[#15895a]"
-            aria-label="Create new tender"
-          >
-            <Plus className="h-5 w-5" />
-          </Link>
-        ) : (
-          <Button
-            asChild
-            variant="ghost"
-            className="w-full rounded-2xl border-2 border-[#1EB472] bg-white px-4 py-5 text-base font-semibold text-[#1A7C4F] shadow-none hover:bg-[#E7F5EE]"
-          >
-            <Link href="/projects/new" className="flex items-center justify-center gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#1EB472] text-[#1EB472]">
-                <Plus className="h-4 w-4" />
-              </span>
-              <span>Create new tender</span>
-            </Link>
-          </Button>
-        )}
+        <CreateProjectDialog
+          trigger={
+            isCollapsed ? (
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center text-[#1EB472] transition-colors hover:text-[#15895a]"
+                aria-label="Create new tender"
+              >
+                <Plus className="h-5 w-5" />
+              </button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full rounded-2xl border-2 border-[#1EB472] bg-white px-4 py-5 text-base font-semibold text-[#1A7C4F] shadow-none hover:bg-[#E7F5EE]"
+              >
+                <span className="flex items-center justify-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#1EB472] text-[#1EB472]">
+                    <Plus className="h-4 w-4" />
+                  </span>
+                  <span>Create new tender</span>
+                </span>
+              </Button>
+            )
+          }
+        />
       </div>
 
       {/* Navigation Items */}

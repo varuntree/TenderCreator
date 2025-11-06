@@ -25,7 +25,7 @@ interface ProjectDocumentUploaderProps {
 export default function ProjectDocumentUploader({
   documents,
   onUpload,
-  onDelete,
+  onDelete: _onDelete,
   onAnalyze,
   projectStatus,
 }: ProjectDocumentUploaderProps) {
