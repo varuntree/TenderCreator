@@ -1,10 +1,12 @@
 import { SupabaseClient } from '@supabase/supabase-js'
+import { BidAnalysis } from '@/libs/ai/bid-analysis'
 
 export interface WorkPackageContent {
   id: string
   work_package_id: string
   win_themes: string[]
   key_messages: string[]
+  bid_analysis: BidAnalysis | null
   content: string // HTML/Markdown
   content_version: number
   exported_file_path: string | null
@@ -17,12 +19,14 @@ export interface CreateWorkPackageContentData {
   work_package_id: string
   win_themes?: string[]
   key_messages?: string[]
+  bid_analysis?: BidAnalysis | null
   content?: string
 }
 
 export interface UpdateWorkPackageContentData {
   win_themes?: string[]
   key_messages?: string[]
+  bid_analysis?: BidAnalysis | null
   content?: string
   exported_file_path?: string | null
   exported_at?: string | null
@@ -92,6 +96,7 @@ export async function updateWorkPackageContent(
 
   if (data.win_themes !== undefined) updateData.win_themes = data.win_themes
   if (data.key_messages !== undefined) updateData.key_messages = data.key_messages
+  if (data.bid_analysis !== undefined) updateData.bid_analysis = data.bid_analysis
   if (data.content !== undefined) {
     updateData.content = data.content
   }
@@ -194,4 +199,38 @@ export async function saveExportedFile(
     exported_file_path: filePath,
     exported_at: new Date().toISOString(),
   })
+}
+
+/**
+ * Save bid analysis for work package
+ * Uses upsert pattern to handle race conditions
+ */
+export async function saveBidAnalysis(
+  supabase: SupabaseClient,
+  workPackageId: string,
+  analysis: BidAnalysis
+): Promise<WorkPackageContent> {
+  if (!workPackageId) {
+    throw new Error('Work package ID is required')
+  }
+
+  if (!analysis) {
+    throw new Error('Bid analysis is required')
+  }
+
+  // Check if content record exists
+  const existing = await getWorkPackageContent(supabase, workPackageId)
+
+  if (existing) {
+    // Update existing
+    console.log(`[saveBidAnalysis] Updating existing content record ${existing.id}`)
+    return await updateWorkPackageContent(supabase, existing.id, { bid_analysis: analysis })
+  } else {
+    // Create new
+    console.log(`[saveBidAnalysis] Creating new content record for work package ${workPackageId}`)
+    return await createWorkPackageContent(supabase, {
+      work_package_id: workPackageId,
+      bid_analysis: analysis,
+    })
+  }
 }

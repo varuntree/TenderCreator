@@ -127,16 +127,16 @@ export default function TeamPage() {
 
   return (
     <div className="space-y-10">
-      <header className="rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-sm">
+      <header className="rounded-2xl border border-[var(--dashboard-border)] bg-white p-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E7F5EE] text-[#0F9D68]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--dashboard-primary-light)] text-[var(--dashboard-primary)]">
               <Users2 className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-[#6B7280]">Team</p>
-              <h1 className="mt-2 text-3xl font-bold text-[#111827]">Manage your workspace</h1>
-              <p className="mt-2 max-w-2xl text-sm text-[#4B5563]">
+              <p className="text-sm font-semibold uppercase tracking-wide text-[var(--dashboard-text-secondary)]">Team</p>
+              <h1 className="mt-2 text-3xl font-bold text-[var(--dashboard-text-primary)]">Manage your workspace</h1>
+              <p className="mt-2 max-w-2xl text-sm text-[var(--dashboard-text-body)]">
                 Manage your team, invite additional users via email, and assign roles so every proposal has the right owners.
               </p>
             </div>
@@ -144,32 +144,32 @@ export default function TeamPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
               variant="outline"
-              className="h-11 rounded-xl border-[#0F9D68] px-5 text-sm font-semibold text-[#0F9D68] hover:bg-[#E7F5EE]"
+              className="h-11 rounded-xl border-[var(--dashboard-primary)] px-5 text-sm font-semibold text-[var(--dashboard-primary)] hover:bg-[var(--dashboard-primary-light)]"
             >
               Export roster
             </Button>
-            <Button className="h-11 rounded-xl bg-[#111827] px-6 text-sm font-semibold text-white shadow-none hover:bg-[#0B1220]">
+            <Button className="h-11 rounded-xl bg-[var(--dashboard-text-primary)] px-6 text-sm font-semibold text-white shadow-none hover:bg-gray-900">
               Invite team member
             </Button>
           </div>
         </div>
       </header>
 
-      <section className="rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-sm">
+      <section className="rounded-2xl border border-[var(--dashboard-border)] bg-white p-8 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-[#111827]">Team members</h2>
-            <p className="mt-1 text-sm text-[#6B7280]">Search, filter, and manage access levels for everyone in your workspace.</p>
+            <h2 className="text-2xl font-semibold text-[var(--dashboard-text-primary)]">Team members</h2>
+            <p className="mt-1 text-sm text-[var(--dashboard-text-secondary)]">Search, filter, and manage access levels for everyone in your workspace.</p>
           </div>
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
-              className="h-10 rounded-xl border border-[#D1D5DB] bg-white px-3 text-sm font-medium text-[#111827] shadow-none hover:bg-[#F3F4F6]"
+              className="h-10 rounded-xl border border-[var(--dashboard-border-light)] bg-white px-3 text-sm font-medium text-[var(--dashboard-text-primary)] shadow-none hover:bg-[var(--dashboard-bg-gray-100)]"
             >
-              <Filter className="h-4 w-4 text-[#6B7280]" />
+              <Filter className="h-4 w-4 text-[var(--dashboard-text-secondary)]" />
               Filters
             </Button>
-            <Button className="h-10 rounded-xl bg-[#10B981] px-4 text-sm font-semibold text-white shadow-none hover:bg-[#0E9F6E]">
+            <Button className="h-10 rounded-xl bg-[var(--dashboard-primary)] px-4 text-sm font-semibold text-white shadow-none hover:bg-[var(--dashboard-primary-hover)]">
               Invite
             </Button>
           </div>
@@ -183,13 +183,13 @@ export default function TeamPage() {
               placeholder="Search by name or email"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              className="search-input h-11 rounded-xl border border-[#D1D5DB] bg-white text-sm text-[#111827] placeholder:text-[#9CA3AF] focus-visible:border-[#10B981] focus-visible:ring-0"
+              className="search-input h-11 rounded-xl border border-[var(--dashboard-border-light)] bg-white text-sm text-[var(--dashboard-text-primary)] placeholder:text-[var(--dashboard-text-muted)] focus-visible:border-[var(--dashboard-primary)] focus-visible:ring-0"
             />
           </div>
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-            <label className="text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Role</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-[var(--dashboard-text-secondary)]">Role</label>
             <Select value={roleFilter} onValueChange={(value) => setRoleFilter(value as 'all' | MemberRole)}>
-              <SelectTrigger className="h-11 w-full rounded-xl border border-[#D1D5DB] text-sm text-[#111827] focus-visible:border-[#10B981] focus-visible:ring-0 sm:w-48">
+              <SelectTrigger className="h-11 w-full rounded-xl border border-[var(--dashboard-border-light)] text-sm text-[var(--dashboard-text-primary)] focus-visible:border-[var(--dashboard-primary)] focus-visible:ring-0 sm:w-48">
                 <SelectValue placeholder="All roles" />
               </SelectTrigger>
               <SelectContent>
@@ -202,7 +202,7 @@ export default function TeamPage() {
           </div>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-[#E5E7EB]">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--dashboard-border)]">
           <table className="min-w-full">
             <thead>
               <tr>
@@ -216,7 +216,7 @@ export default function TeamPage() {
             <tbody>
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-sm text-[#6B7280]">
+                  <td colSpan={5} className="py-12 text-center text-sm text-[var(--dashboard-text-secondary)]">
                     No team members match that search. Clear filters to see everyone in your workspace.
                   </td>
                 </tr>
@@ -226,20 +226,20 @@ export default function TeamPage() {
                   <td>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-11 w-11">
-                        <AvatarFallback className="rounded-full bg-[#E7F5EE] text-sm font-semibold text-[#0F9D68]">
+                        <AvatarFallback className="rounded-full bg-[var(--dashboard-primary-light)] text-sm font-semibold text-[var(--dashboard-primary)]">
                           {getInitials(member.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-semibold text-[#111827]">{member.name}</p>
-                        <p className="text-sm text-[#6B7280]">{member.email}</p>
+                        <p className="text-sm font-semibold text-[var(--dashboard-text-primary)]">{member.name}</p>
+                        <p className="text-sm text-[var(--dashboard-text-secondary)]">{member.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="text-sm text-[#4B5563]">{member.joined}</td>
+                  <td className="text-sm text-[var(--dashboard-text-body)]">{member.joined}</td>
                   <td>
                     <Select value={member.role} onValueChange={(value) => handleRoleChange(member.id, value as MemberRole)}>
-                      <SelectTrigger className="h-10 w-44 rounded-xl border border-[#D1D5DB] text-sm text-[#111827]">
+                      <SelectTrigger className="h-10 w-44 rounded-xl border border-[var(--dashboard-border-light)] text-sm text-[var(--dashboard-text-primary)]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -257,11 +257,11 @@ export default function TeamPage() {
                   <td className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full text-[#6B7280] hover:bg-[#F3F4F6]">
+                        <Button variant="ghost" className="h-9 w-9 rounded-full text-[var(--dashboard-text-secondary)] hover:bg-[var(--dashboard-bg-gray-100)]">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="rounded-xl border border-[#E5E7EB]">
+                      <DropdownMenuContent align="end" className="rounded-xl border border-[var(--dashboard-border)]">
                         <DropdownMenuLabel>Quick actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
@@ -280,33 +280,33 @@ export default function TeamPage() {
         </div>
       </section>
 
-      <section className="space-y-6 rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-sm">
+      <section className="space-y-6 rounded-2xl border border-[var(--dashboard-border)] bg-white p-8 shadow-sm">
         <div>
-          <h2 className="text-2xl font-semibold text-[#111827]">Organisation roles</h2>
-          <p className="mt-1 text-sm text-[#6B7280]">Snapshot of what each permission tier can do across TenderCreator.</p>
+          <h2 className="text-2xl font-semibold text-[var(--dashboard-text-primary)]">Organisation roles</h2>
+          <p className="mt-1 text-sm text-[var(--dashboard-text-secondary)]">Snapshot of what each permission tier can do across TenderCreator.</p>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
           {roleCards.map((role) => (
-            <article key={role.id} className="flex h-full flex-col rounded-2xl border border-[#E5E7EB] p-6">
+            <article key={role.id} className="flex h-full flex-col rounded-2xl border border-[var(--dashboard-border)] p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#111827]">{role.title}</h3>
+                  <h3 className="text-lg font-semibold text-[var(--dashboard-text-primary)]">{role.title}</h3>
                   {role.badge && (
-                    <span className="badge badge-primary mt-2 inline-flex items-center gap-2 bg-[#10B981] text-[11px] font-semibold uppercase tracking-wide text-white">
+                    <span className="badge badge-primary mt-2 inline-flex items-center gap-2 bg-[var(--dashboard-primary)] text-[11px] font-semibold uppercase tracking-wide text-white">
                       <ShieldCheck className="h-3.5 w-3.5" />
                       {role.badge}
                     </span>
                   )}
                 </div>
-                <Badge className="rounded-full bg-[#F3F4F6] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                <Badge className="rounded-full bg-[var(--dashboard-bg-gray-100)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--dashboard-text-secondary)]">
                   {role.title}
                 </Badge>
               </div>
-              <p className="mt-4 text-sm text-[#4B5563]">{role.description}</p>
-              <ul className="mt-4 space-y-3 text-sm text-[#111827]">
+              <p className="mt-4 text-sm text-[var(--dashboard-text-body)]">{role.description}</p>
+              <ul className="mt-4 space-y-3 text-sm text-[var(--dashboard-text-primary)]">
                 {role.highlights.map((highlight) => (
                   <li key={highlight} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#10B981]" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--dashboard-primary)]" />
                     <span>{highlight}</span>
                   </li>
                 ))}
@@ -321,9 +321,9 @@ export default function TeamPage() {
 
 function StatusBadge({ status }: { status: MemberStatus }) {
   if (status === 'pending') {
-    return <span className="badge badge-muted rounded-full bg-[#FEF3C7] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#92400E]">Pending invite</span>
+    return <span className="badge badge-muted rounded-full bg-yellow-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-yellow-800">Pending invite</span>
   }
-  return <span className="badge badge-green rounded-full bg-[#E7F5EE] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#0F9D68]">Active</span>
+  return <span className="badge badge-green rounded-full bg-[var(--dashboard-primary-light)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--dashboard-primary)]">Active</span>
 }
 
 function getInitials(name: string) {

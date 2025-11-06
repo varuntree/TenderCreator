@@ -99,7 +99,7 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex h-full flex-col border-r border-[#DDE3EE] bg-white transition-all duration-300',
+        'flex h-full flex-col border-r border-[var(--dashboard-border)] bg-white transition-all duration-300',
         isCollapsed ? 'w-20 px-3 py-4' : 'w-72 px-6 py-6'
       )}
     >
@@ -115,7 +115,7 @@ export default function Sidebar() {
             isCollapsed ? (
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center text-[#1EB472] transition-colors hover:text-[#15895a]"
+                className="flex h-10 w-10 items-center justify-center text-[var(--dashboard-primary)] transition-colors hover:text-[var(--dashboard-primary-hover)]"
                 aria-label="Create new tender"
               >
                 <Plus className="h-5 w-5" />
@@ -124,10 +124,10 @@ export default function Sidebar() {
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full rounded-2xl border-2 border-[#1EB472] bg-white px-4 py-5 text-base font-semibold text-[#1A7C4F] shadow-none hover:bg-[#E7F5EE]"
+                className="w-full rounded-2xl border-2 border-[var(--dashboard-primary)] bg-white px-4 py-5 text-base font-semibold text-emerald-700 shadow-none hover:bg-[var(--dashboard-primary-light)]"
               >
                 <span className="flex items-center justify-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#1EB472] text-[#1EB472]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--dashboard-primary)] text-[var(--dashboard-primary)]">
                     <Plus className="h-4 w-4" />
                   </span>
                   <span>Create new tender</span>
@@ -151,8 +151,8 @@ export default function Sidebar() {
               className={cn(
                 'flex items-center gap-4 rounded-2xl px-4 py-3 text-base font-medium transition-all duration-200',
                 active
-                  ? 'bg-[#E8ECEF] text-[#151F32] shadow-inner'
-                  : 'text-[#94A3B8] hover:text-[#0F172A]',
+                  ? 'bg-gray-100 text-gray-900 shadow-inner'
+                  : 'text-gray-400 hover:text-gray-900',
                 isCollapsed && 'justify-center px-0'
               )}
             >
@@ -160,14 +160,14 @@ export default function Sidebar() {
                 className={cn(
                   'flex h-10 w-10 items-center justify-center rounded-2xl border border-transparent text-lg transition-all',
                   active
-                    ? 'border-[#C5CFDA] bg-white text-[#1EB472]'
-                    : 'text-[#9CAFC6]'
+                    ? 'border-gray-300 bg-white text-[var(--dashboard-primary)]'
+                    : 'text-gray-400'
                 )}
               >
                 <Icon className="h-5 w-5" />
               </span>
               {!isCollapsed && (
-                <span className={cn(active ? 'text-[#111827]' : 'text-inherit')}>{item.name}</span>
+                <span className={cn(active ? 'text-[var(--dashboard-text-primary)]' : 'text-inherit')}>{item.name}</span>
               )}
             </Link>
           )
@@ -180,7 +180,7 @@ export default function Sidebar() {
           type="button"
           onClick={toggleCollapse}
           className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-[#1EB472] text-[#1EB472] transition-colors hover:bg-[#E7F5EE]'
+            'flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-[var(--dashboard-primary)] text-[var(--dashboard-primary)] transition-colors hover:bg-[var(--dashboard-primary-light)]'
           )}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >

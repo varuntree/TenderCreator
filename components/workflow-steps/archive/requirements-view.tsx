@@ -1,3 +1,12 @@
+/**
+ * ARCHIVED: 2025-11-06
+ * This component was removed as part of the content generation flow refactor.
+ * The Requirements step was redundant - requirements are now shown in the Requirements tab
+ * within the Strategy step. This keeps all planning content together in one place.
+ *
+ * See: specs/content-generation-flow-refactor/content-generation-flow-refactor.md
+ */
+
 import { ChevronLeft,ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 

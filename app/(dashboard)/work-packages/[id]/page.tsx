@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { TabsContent } from '@/components/ui/tabs'
 import { EditorScreen } from '@/components/workflow-steps/editor-screen'
 import { ExportScreen } from '@/components/workflow-steps/export-screen'
-import { RequirementsView } from '@/components/workflow-steps/requirements-view'
 import { StrategyGenerationScreen } from '@/components/workflow-steps/strategy-generation-screen'
 import { WorkflowTabs } from '@/components/workflow-steps/workflow-tabs'
 import { WorkPackageContent } from '@/libs/repositories/work-package-content'
@@ -23,7 +22,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
   const [workPackage, setWorkPackage] = useState<WorkPackage | null>(null)
   const [project, setProject] = useState<{ id: string; name: string } | null>(null)
   const [content, setContent] = useState<WorkPackageContent | null>(null)
-  const [currentTab, setCurrentTab] = useState<'requirements' | 'strategy' | 'edit' | 'export'>('requirements')
+  const [currentTab, setCurrentTab] = useState<'strategy' | 'edit' | 'export'>('strategy')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -75,10 +74,16 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
   }, [workPackageId, loadData])
 
   const getCompletedSteps = () => {
-    const steps = ['requirements']
+    const steps: string[] = []
+    // Mark strategy complete if win themes OR content exists
+    if (content?.win_themes && content.win_themes.length > 0) {
+      steps.push('strategy')
+    }
+    // Mark edit complete if content exists
     if (content?.content) {
       steps.push('strategy', 'edit')
     }
+    // Mark export complete if status is completed
     if (workPackage?.status === 'completed') {
       steps.push('export')
     }
@@ -110,14 +115,6 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
         completedSteps={getCompletedSteps()}
         className="flex flex-1 flex-col min-h-0"
       >
-        <TabsContent value="requirements" className="flex flex-1 flex-col min-h-0 overflow-auto px-2">
-          <RequirementsView
-            workPackage={workPackage}
-            projectId={project.id}
-            onContinue={() => setCurrentTab('strategy')}
-          />
-        </TabsContent>
-
         <TabsContent value="strategy" className="flex flex-1 flex-col min-h-0 overflow-auto px-2">
           <StrategyGenerationScreen
             workPackageId={workPackageId}
