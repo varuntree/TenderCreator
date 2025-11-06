@@ -47,14 +47,17 @@ export async function POST(
     }
 
     // Generate win themes
+    console.log(`[Win Themes] Generating for work package ${workPackageId}...`)
     const winThemes = await generateWinThemes(
       workPackage,
       context.organizationDocs,
       context.rftDocs
     )
+    console.log(`[Win Themes] Generated ${winThemes.length} themes`)
 
     // Save to database
     await saveWinThemes(supabase, workPackageId, winThemes)
+    console.log(`[Win Themes] Saved to database`)
 
     return Response.json({ success: true, win_themes: winThemes })
   } catch (error) {

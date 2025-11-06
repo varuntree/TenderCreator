@@ -78,7 +78,7 @@ export function RequirementsView({ workPackage, projectId, onContinue }: Require
           </Link>
         </Button>
         <Button onClick={onContinue}>
-          Continue to Strategy
+          Continue
           <ChevronRight className="ml-2 size-4" />
         </Button>
       </div>

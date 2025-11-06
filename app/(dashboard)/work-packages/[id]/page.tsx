@@ -6,10 +6,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { TabsContent } from '@/components/ui/tabs'
 import { EditorScreen } from '@/components/workflow-steps/editor-screen'
 import { ExportScreen } from '@/components/workflow-steps/export-screen'
-import { GenerationScreen } from '@/components/workflow-steps/generation-screen'
 import { RequirementsView } from '@/components/workflow-steps/requirements-view'
-import { StrategyScreen } from '@/components/workflow-steps/strategy-screen'
+import { StrategyGenerationScreen } from '@/components/workflow-steps/strategy-generation-screen'
 import { WorkflowTabs } from '@/components/workflow-steps/workflow-tabs'
+import { WorkPackageContent } from '@/libs/repositories/work-package-content'
 import { WorkPackage } from '@/libs/repositories/work-packages'
 
 interface WorkPackagePageProps {
@@ -22,8 +22,8 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
   const [workPackageId, setWorkPackageId] = useState<string | null>(null)
   const [workPackage, setWorkPackage] = useState<WorkPackage | null>(null)
   const [project, setProject] = useState<{ id: string; name: string } | null>(null)
-  const [content, setContent] = useState<Record<string, unknown> | null>(null)
-  const [currentTab, setCurrentTab] = useState<'requirements' | 'strategy' | 'generate' | 'edit' | 'export'>('requirements')
+  const [content, setContent] = useState<WorkPackageContent | null>(null)
+  const [currentTab, setCurrentTab] = useState<'requirements' | 'strategy' | 'edit' | 'export'>('requirements')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
           // Determine current tab based on progress
           if (contentData.content) {
             setCurrentTab('edit')
-          } else if (contentData.win_themes && contentData.win_themes.length > 0) {
+          } else {
             setCurrentTab('strategy')
           }
         }
@@ -76,11 +76,8 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
 
   const getCompletedSteps = () => {
     const steps = ['requirements']
-    if (content?.win_themes && Array.isArray(content.win_themes) && content.win_themes.length > 0) {
-      steps.push('strategy')
-    }
     if (content?.content) {
-      steps.push('generate', 'edit')
+      steps.push('strategy', 'edit')
     }
     if (workPackage?.status === 'completed') {
       steps.push('export')
@@ -122,30 +119,21 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
         </TabsContent>
 
         <TabsContent value="strategy" className="flex flex-1 flex-col min-h-0 overflow-auto">
-          <StrategyScreen
-            workPackageId={workPackageId}
-            initialWinThemes={content?.win_themes as string[] | undefined}
-            onContinue={() => setCurrentTab('generate')}
-            onBack={() => setCurrentTab('requirements')}
-          />
-        </TabsContent>
-
-        <TabsContent value="generate" className="flex flex-1 flex-col min-h-0 overflow-auto">
-          <GenerationScreen
+          <StrategyGenerationScreen
             workPackageId={workPackageId}
             workPackage={workPackage}
-            winThemesCount={Array.isArray(content?.win_themes) ? content.win_themes.length : 0}
+            initialContent={content}
             onContinue={() => setCurrentTab('edit')}
-            onBack={() => setCurrentTab('strategy')}
+            onRefresh={loadData}
           />
         </TabsContent>
 
         <TabsContent value="edit" className="flex flex-1 flex-col min-h-0">
           <EditorScreen
             workPackageId={workPackageId}
-            initialContent={(content?.content as string) || ''}
+            initialContent={content?.content || ''}
             onContinue={() => setCurrentTab('export')}
-            onBack={() => setCurrentTab('generate')}
+            onBack={() => setCurrentTab('strategy')}
           />
         </TabsContent>
 

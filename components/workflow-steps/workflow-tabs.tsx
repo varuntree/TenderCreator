@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 
 interface WorkflowTabsProps {
-  currentTab: 'requirements' | 'strategy' | 'generate' | 'edit' | 'export'
+  currentTab: 'requirements' | 'strategy' | 'edit' | 'export'
   onTabChange: (tab: string) => void
   completedSteps: string[]
   children: React.ReactNode
@@ -22,8 +22,7 @@ export function WorkflowTabs({
 }: WorkflowTabsProps) {
   const tabs = [
     { id: 'requirements', label: 'Requirements' },
-    { id: 'strategy', label: 'Strategy' },
-    { id: 'generate', label: 'Generate' },
+    { id: 'strategy', label: 'Strategy & Generate' },
     { id: 'edit', label: 'Edit' },
     { id: 'export', label: 'Export' },
   ]

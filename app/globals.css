@@ -163,6 +163,18 @@
   --sidebar-accent-foreground: oklch(0.041 0.002 314);
   --sidebar-border: oklch(0 0 0 / 10%);
   --sidebar-ring: oklch(0.43 0 0);
+
+  /* Folder Color Variants - Professional Pastels */
+  --folder-blue-from: 210 45% 92%;
+  --folder-blue-to: 210 45% 88%;
+  --folder-green-from: 145 40% 90%;
+  --folder-green-to: 145 40% 86%;
+  --folder-purple-from: 270 40% 92%;
+  --folder-purple-to: 270 40% 88%;
+  --folder-orange-from: 30 50% 92%;
+  --folder-orange-to: 30 50% 88%;
+  --folder-pink-from: 330 45% 92%;
+  --folder-pink-to: 330 45% 88%;
 }
 .dark {
   /* Gradient Text Colors - Green & Orange Theme (same for dark mode) */
@@ -205,6 +217,18 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.63 0 0);
+
+  /* Folder Color Variants - Dark Mode (slightly desaturated) */
+  --folder-blue-from: 210 35% 25%;
+  --folder-blue-to: 210 35% 20%;
+  --folder-green-from: 145 30% 23%;
+  --folder-green-to: 145 30% 18%;
+  --folder-purple-from: 270 30% 25%;
+  --folder-purple-to: 270 30% 20%;
+  --folder-orange-from: 30 40% 25%;
+  --folder-orange-to: 30 40% 20%;
+  --folder-pink-from: 330 35% 25%;
+  --folder-pink-to: 330 35% 20%;
 }
 
 @layer base {

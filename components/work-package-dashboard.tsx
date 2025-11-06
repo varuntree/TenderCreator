@@ -135,6 +135,7 @@ export function WorkPackageDashboard({
         onAssignmentChange={handleAssignmentChange}
         onStatusChange={handleStatusChange}
         onOpen={handleOpen}
+        onRefresh={onUpdate}
       />
     </div>
   )

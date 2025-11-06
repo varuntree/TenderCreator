@@ -2,7 +2,7 @@ import { FolderOpen } from 'lucide-react'
 import Link from 'next/link'
 
 import { EmptyState } from '@/components/empty-state'
-import ProjectCard from '@/components/project-card'
+import FolderProjectCard from '@/components/folder-project-card'
 import { Button } from '@/components/ui/button'
 import { getOrganizationByUserId,listProjects } from '@/libs/repositories'
 import { createClient } from '@/libs/supabase/server'
@@ -51,8 +51,8 @@ export default async function ProjectsPage() {
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+          {projects.map((project, index) => (
+            <FolderProjectCard key={project.id} project={project} colorIndex={index} />
           ))}
         </div>
       )}

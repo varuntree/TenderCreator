@@ -2,7 +2,6 @@ import '@/app/(dashboard)/globals-dashboard.css'
 
 import { redirect } from 'next/navigation'
 
-import Breadcrumbs from '@/components/breadcrumbs'
 import Navbar from '@/components/navbar'
 import Sidebar from '@/components/sidebar'
 import { createClient } from '@/libs/supabase/server'
@@ -31,7 +30,6 @@ export default async function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar />
         <main className="flex-1 overflow-y-auto bg-gray-50 p-8">
-          <Breadcrumbs />
           {children}
         </main>
       </div>

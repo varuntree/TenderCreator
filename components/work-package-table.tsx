@@ -1,6 +1,8 @@
 'use client'
 
-import { Circle, CircleCheck, CircleDot } from 'lucide-react'
+import { useState } from 'react'
+import { Circle, CircleCheck, CircleDot, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -18,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { bulkGenerateDocuments } from '@/libs/utils/bulk-generation'
 
 interface WorkPackage {
   id: string
@@ -38,6 +41,7 @@ interface WorkPackageTableProps {
   onAssignmentChange: (workPackageId: string, mockUserId: string) => void
   onStatusChange: (workPackageId: string, status: string) => void
   onOpen: (workPackageId: string) => void
+  onRefresh?: () => void
 }
 
 const mockUsers = [
@@ -51,8 +55,24 @@ export function WorkPackageTable({
   onAssignmentChange,
   onStatusChange,
   onOpen,
+  onRefresh,
 }: WorkPackageTableProps) {
-  const getStatusDisplay = (status: string) => {
+  const [generatingIds, setGeneratingIds] = useState<string[]>([])
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  // Calculate pending documents count
+  const pendingCount = workPackages.filter(wp => wp.status !== 'completed').length
+  const allCompleted = pendingCount === 0
+
+  const getStatusDisplay = (status: string, isGenerating: boolean) => {
+    if (isGenerating) {
+      return {
+        icon: Loader2,
+        label: 'Generating...',
+        className: 'text-blue-600 animate-spin',
+      }
+    }
+
     switch (status) {
       case 'completed':
         return {
@@ -70,7 +90,7 @@ export function WorkPackageTable({
         return {
           icon: Circle,
           label: 'Not Started',
-          className: 'text-blue-600',
+          className: 'text-gray-600',
         }
     }
   }
@@ -81,64 +101,152 @@ export function WorkPackageTable({
     return user?.name || 'Unassigned'
   }
 
-  return (
-    <div className="rounded-lg border bg-card">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Document Type</TableHead>
-            <TableHead>Assigned To</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {workPackages.map((wp) => {
-            const statusDisplay = getStatusDisplay(wp.status)
-            const StatusIcon = statusDisplay.icon
+  const handleGenerateAll = async () => {
+    // Get pending work packages
+    const pendingWorkPackages = workPackages.filter(wp => wp.status !== 'completed')
 
-            return (
-              <TableRow key={wp.id} className="bg-muted/20 hover:bg-muted/40 transition-colors">
-                <TableCell className="font-medium">{wp.document_type}</TableCell>
-                <TableCell>
-                  <Select
-                    value={wp.assigned_to || 'unassigned'}
-                    onValueChange={(value) => onAssignmentChange(wp.id, value)}
-                  >
-                    <SelectTrigger className="w-[140px]">
-                      <SelectValue>
-                        {getUserName(wp.assigned_to)}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="unassigned">Unassigned</SelectItem>
-                      {mockUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <div className={`flex items-center gap-2 ${statusDisplay.className}`}>
-                    <StatusIcon className="h-5 w-5" />
-                    <span className="font-medium">{statusDisplay.label}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    size="sm"
-                    onClick={() => onOpen(wp.id)}
-                  >
-                    Open
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+    if (pendingWorkPackages.length === 0) {
+      toast.info('All documents are already generated')
+      return
+    }
+
+    // Confirm action
+    const confirmed = window.confirm(
+      `Generate all ${pendingWorkPackages.length} pending documents? This may take several minutes.`
+    )
+
+    if (!confirmed) return
+
+    // Set loading state
+    setIsGenerating(true)
+    setGeneratingIds(pendingWorkPackages.map(wp => wp.id))
+
+    // Show initial toast
+    toast.info(`Starting generation of ${pendingWorkPackages.length} documents...`)
+
+    try {
+      // Call bulk generation
+      const result = await bulkGenerateDocuments(pendingWorkPackages, (progress) => {
+        // Update generating IDs based on progress
+        const stillGenerating = progress
+          .filter(p => p.status !== 'completed' && p.status !== 'error')
+          .map(p => p.workPackageId)
+
+        setGeneratingIds(stillGenerating)
+      })
+
+      // Show results
+      const totalAttempted = result.succeeded.length + result.failed.length
+      const successMessage = `Generated ${result.succeeded.length} of ${totalAttempted} documents successfully`
+
+      if (result.failed.length > 0) {
+        toast.error(`${successMessage}. ${result.failed.length} failed.`)
+        console.error('[Bulk Generation] Failed documents:', result.failed)
+      } else {
+        toast.success(successMessage)
+      }
+
+      // Refresh work packages
+      if (onRefresh) {
+        onRefresh()
+      }
+    } catch (error) {
+      console.error('[Bulk Generation] Error:', error)
+      toast.error('Failed to generate documents. Please try again.')
+    } finally {
+      // Clear loading state
+      setIsGenerating(false)
+      setGeneratingIds([])
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Generate All Button */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {allCompleted ? (
+            <span>All {workPackages.length} documents completed</span>
+          ) : (
+            <span>{pendingCount} of {workPackages.length} documents pending</span>
+          )}
+        </div>
+        <Button
+          onClick={handleGenerateAll}
+          disabled={allCompleted || isGenerating}
+          size="lg"
+          className="gap-2"
+        >
+          {isGenerating && <Loader2 className="h-4 w-4 animate-spin" />}
+          {allCompleted
+            ? "All Documents Generated"
+            : `Generate All Documents (${pendingCount})`
+          }
+        </Button>
+      </div>
+
+      {/* Work Packages Table */}
+      <div className="rounded-lg border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Document Type</TableHead>
+              <TableHead>Assigned To</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {workPackages.map((wp) => {
+              const isDocGenerating = generatingIds.includes(wp.id)
+              const statusDisplay = getStatusDisplay(wp.status, isDocGenerating)
+              const StatusIcon = statusDisplay.icon
+
+              return (
+                <TableRow key={wp.id} className="bg-muted/20 hover:bg-muted/40 transition-colors">
+                  <TableCell className="font-medium">{wp.document_type}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={wp.assigned_to || 'unassigned'}
+                      onValueChange={(value) => onAssignmentChange(wp.id, value)}
+                      disabled={isDocGenerating}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue>
+                          {getUserName(wp.assigned_to)}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        {mockUsers.map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <div className={`flex items-center gap-2 ${statusDisplay.className}`}>
+                      <StatusIcon className="h-5 w-5" />
+                      <span className="font-medium">{statusDisplay.label}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      onClick={() => onOpen(wp.id)}
+                      disabled={isDocGenerating}
+                    >
+                      Open
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }

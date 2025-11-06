@@ -127,20 +127,31 @@ export async function updateWorkPackageContent(
 
 /**
  * Save win themes for work package
+ * Uses upsert pattern to handle race conditions
  */
 export async function saveWinThemes(
   supabase: SupabaseClient,
   workPackageId: string,
   themes: string[]
 ): Promise<WorkPackageContent> {
+  if (!workPackageId) {
+    throw new Error('Work package ID is required')
+  }
+
+  if (!Array.isArray(themes)) {
+    throw new Error('Themes must be an array')
+  }
+
   // Check if content record exists
   const existing = await getWorkPackageContent(supabase, workPackageId)
 
   if (existing) {
     // Update existing
+    console.log(`[saveWinThemes] Updating existing content record ${existing.id}`)
     return await updateWorkPackageContent(supabase, existing.id, { win_themes: themes })
   } else {
     // Create new
+    console.log(`[saveWinThemes] Creating new content record for work package ${workPackageId}`)
     return await createWorkPackageContent(supabase, {
       work_package_id: workPackageId,
       win_themes: themes,

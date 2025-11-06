@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import Breadcrumbs from '@/components/breadcrumbs'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,7 +30,8 @@ export default function Navbar() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-end border-b border-gray-200 bg-white px-8">
+    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-8">
+      <Breadcrumbs />
 
       {/* Right Section - User Avatar */}
       <DropdownMenu>

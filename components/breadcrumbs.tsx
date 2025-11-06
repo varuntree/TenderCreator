@@ -22,9 +22,9 @@ export default function Breadcrumbs() {
   const pageName = getPageName(pathname)
 
   return (
-    <div className="flex items-center gap-2 text-gray-600 mb-6">
+    <div className="flex items-center gap-2 text-sm font-medium text-gray-600">
       <Home className="h-5 w-5" />
-      <span className="text-sm font-medium">{pageName}</span>
+      <span>{pageName}</span>
     </div>
   )
 }
