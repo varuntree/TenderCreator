@@ -1,11 +1,11 @@
-# Phase Planning
+# Planning
 
-Create a comprehensive plan in ai_docs/documentation/phases_spec/<phase_name>/ to implement the `Phase` using the two-step workflow below. Follow the `Instructions` to create the plan, use the `Relevant Files` to focus on the right files.
+Create a comprehensive plan in specs/<plan_name>/ to implement the task using the two-step workflow below. Follow the `Instructions` to create the plan, use the `Relevant Files` to focus on the right files.
 
 ## Instructions
 
-- You're planning an entire phase of development that encompasses multiple related features and foundational work.
-- IMPORTANT: Before starting, read previous phase specifications in `ai_docs/documentation/phases_spec/` to understand context and dependencies.
+- You're planning a task that may encompass multiple related features and foundational work.
+- IMPORTANT: Before starting, read previous specifications in `specs/` to understand context and dependencies.
 - Follow the two-step workflow:
   - **Step 1**: Create summary of phase + ask clarifying questions
   - **Step 2**: After questions answered, create detailed plan
@@ -14,8 +14,8 @@ Create a comprehensive plan in ai_docs/documentation/phases_spec/<phase_name>/ t
 - Deploy research sub-agents when needed to:
   - Gather complete documentation for complex implementations (e.g., LLM workflows, hallucination reduction techniques)
   - Research best practices and implementation approaches
-  - Create research documentation in the phase folder
-- Create all outputs in `ai_docs/documentation/phases_spec/<phase_name>/` where <phase_name> is derived from the phase description.
+  - Create research documentation in the plan folder
+- Create all outputs in `specs/<plan_name>/` where <plan_name> is derived from the task description.
 - Follow existing patterns and conventions in the codebase. Don't reinvent the wheel.
 - If you need a new library, use `npm install` and be sure to report it in the `Notes` section.
 -IMPORTANT: If the feature includes UI components or user interactions:
@@ -62,7 +62,6 @@ Focus on the following files:
 - `ai_docs/documentation/CONTEXT.md` - Contains the project context and overview.
 - `ai_docs/documentation/PRD.md` - Contains the product requirements document.
 - `ai_docs/documentation/standards/*` - Contains coding patterns and standards.
-- `ai_docs/documentation/phases_spec/*/` - Contains previous phase specifications.
 
 Ignore all other files in the codebase.
 
@@ -70,7 +69,7 @@ Ignore all other files in the codebase.
 
 After reading all relevant documentation, provide:
 
-1. **Phase Summary** (concise, 3-5 bullet points covering main objectives)
+1. **Plan Summary** (concise, 3-5 bullet points covering main objectives)
 2. **Unresolved Questions** (list all choices/decisions needed):
    - Tech stack choices
    - Implementation approach options
@@ -81,7 +80,7 @@ After reading all relevant documentation, provide:
 
 Format as:
 ```md
-## Phase Summary
+## Plan Summary
 - <main objective 1>
 - <main objective 2>
 - <main objective 3>
@@ -105,43 +104,43 @@ STOP after providing summary and questions. Wait for user to answer before proce
 
 Create the detailed plan using the `Plan Format` below.
 
-IMPORTANT: Replace every <placeholder> in the `Plan Format` with the requested value. Add as much detail as needed to implement the phase successfully.
+IMPORTANT: Replace every <placeholder> in the `Plan Format` with the requested value. Add as much detail as needed to implement the task successfully.
 
 If complex implementation research is needed (e.g., LLM workflows, agent architectures), deploy research sub-agent first:
-- Research sub-agent creates documentation in `ai_docs/documentation/phases_spec/<phase_name>/research_<topic>.md`
+- Research sub-agent creates documentation in `specs/<plan_name>/research_<topic>.md`
 - Then incorporate findings into the plan
 
 ## Plan Format
 
 ```md
-# Phase: <phase name>
+# Plan: <plan_name>
 
-## Phase Description
-<describe the phase in detail, including its scope, objectives, and value to the application>
+## Plan Description
+<describe the task in detail, including its scope, objectives, and value to the application>
 
-## Phase Objectives
-<list the key objectives this phase aims to achieve>
+## Plan Objectives
+<list the key objectives this task aims to achieve>
 
 ## Problem Statement
-<clearly define the specific problems or opportunities this phase addresses>
+<clearly define the specific problems or opportunities this task addresses>
 
 ## Solution Statement
 <describe the proposed solution approach and how it addresses the problems>
 
 ## Dependencies
-### Previous Phases
-<list previous phases this depends on and what specifically is needed from them>
+### Previous Plans
+<list previous plans this depends on and what specifically is needed from them>
 
 ### External Dependencies
 <list any external libraries, services, or resources needed>
 
 ## Relevant Files
-Use these files to implement the phase:
+Use these files to implement the task:
 
-<find and list the files that are relevant to the phase, describe why they are relevant in bullet points. If there are new files that need to be created to implement the phase, list them in an h3 'New Files' section.>
+<find and list the files that are relevant to the task, describe why they are relevant in bullet points. If there are new files that need to be created to implement the task, list them in an h3 'New Files' section.>
 
 ## Acceptance Criteria
-<list specific, measurable criteria that must be met for the phase to be considered complete>
+<list specific, measurable criteria that must be met for the task to be considered complete>
 
 ## Step by Step Tasks
 
@@ -159,7 +158,7 @@ Use these files to implement the phase:
 
 <list step details as bullet points>
 
-<continue with all steps... use as many h3 headers as needed to implement the phase. Order matters, start with the foundational shared changes required then move on to the specific implementation. No testing, keep things simple. Your last step should be running the `Validation Commands` to validate the phase works correctly.>
+<continue with all steps... use as many h3 headers as needed to implement the task. Order matters, start with the foundational shared changes required then move on to the specific implementation. No testing, keep things simple. Your last step should be running the `Validation Commands` to validate the task works correctly.>
 
 <Add checkpoints after major transitions:>
 ---
@@ -167,9 +166,9 @@ Use these files to implement the phase:
 ---
 
 ## Validation Commands
-Execute every command to validate the phase works correctly.
+Execute every command to validate the task works correctly.
 
-<list commands you'll use to validate the phase is implemented correctly. every command must execute without errors. Include commands to validate the phase end-to-end.>
+<list commands you'll use to validate the task is implemented correctly. every command must execute without errors. Include commands to validate the task end-to-end.>
 
 
 <list commands you'll use to validate with 100% confidence the feature is implemented correctly with zero regressions. every command must execute without errors so be specific about what you want to run to validate the feature works as expected. Include commands to test the feature end-to-end.>
@@ -183,14 +182,14 @@ Execute every command to validate the phase works correctly.
 - you will write the detailed tests in format of the workflow in the /Users/varunprasad/code/prjs/tendercreator/tendercreator/.claude/commands/test_e2e.md
 
 # Implementation log created at:
-# {plan_directory}/{phase_name}_implementation.log
+# specs/<plan_name>/<plan_name>_implementation.log
 
 ## Notes
-<optionally list any additional notes, future considerations, or context that are relevant to the phase that will be helpful to the developer>
+<optionally list any additional notes, future considerations, or context that are relevant to the task that will be helpful to the developer>
 
 ## Research Documentation
 <if research sub-agents were deployed, list the research documentation files created and their purpose>
 ```
 
-## Phase Description
+## Plan Description
 $ARGUMENTS
