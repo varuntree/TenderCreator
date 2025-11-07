@@ -8,6 +8,8 @@ import {
   buildRephrasePrompt,
   buildCompliancePrompt,
   buildCustomPrompt,
+  buildSelectionEditPrompt,
+  selectionEditSystemInstruction,
 } from './prompts/editor-actions'
 import { WorkPackage, Requirement } from '@/libs/repositories/work-packages'
 import { ProjectContext } from './context-assembly'
@@ -141,5 +143,58 @@ export async function executeEditorAction(
   } catch (error) {
     console.error('[Editor Action] Failed:', error)
     throw error
+  }
+}
+
+interface SelectionEditArgs {
+  instruction: string
+  selectedText: string
+  fullDocument: string
+  documentType: string
+  projectName: string
+}
+
+export async function runSelectionEdit({
+  instruction,
+  selectedText,
+  fullDocument,
+  documentType,
+  projectName,
+}: SelectionEditArgs): Promise<string> {
+  try {
+    const prompt = buildSelectionEditPrompt({
+      instruction,
+      selectedText,
+      fullDocument,
+      documentType,
+      projectName,
+    })
+
+    const result = await model.generateContent({
+      systemInstruction: selectionEditSystemInstruction,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.3,
+      },
+    })
+
+    const responseText = result.response.text().trim()
+    if (!responseText) {
+      throw new Error('AI returned an empty response.')
+    }
+
+    return responseText
+  } catch (error) {
+    console.error('[Selection Edit] Failed:', error)
+    const parsedError = parseGeminiError(error)
+    const enhancedError = error instanceof Error ? error : new Error('AI selection edit failed')
+    ;(enhancedError as any).isRateLimitError = parsedError.isRateLimitError
+    ;(enhancedError as any).retryDelaySeconds = parsedError.retryDelaySeconds
+    throw enhancedError
   }
 }

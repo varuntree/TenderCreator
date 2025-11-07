@@ -6,17 +6,23 @@ import { Table } from '@tiptap/extension-table'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableRow } from '@tiptap/extension-table-row'
+import type { Editor as TiptapEditor } from '@tiptap/react'
 import { EditorContent, useEditor } from '@tiptap/react'
+import type { BubbleMenuProps } from '@tiptap/react/menus'
+import { BubbleMenu } from '@tiptap/react/menus'
 import StarterKit from '@tiptap/starter-kit'
 import debounce from 'lodash/debounce'
-import { useEffect, useMemo, useState } from 'react'
+import { Loader2, PenLine, SendHorizontal } from 'lucide-react'
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { htmlToMarkdown } from '@/libs/utils/html-to-markdown'
 
 import { EditorToolbar } from './editor-toolbar'
+import { AiSelectionHighlight } from './extensions/ai-selection-highlight'
 
 const HTML_DETECTION_REGEX = /<\/?[a-z][\s\S]*>/i
+type BubbleShouldShowProps = Parameters<NonNullable<BubbleMenuProps['shouldShow']>>[0]
 
 const unescapeMarkdown = (value: string) =>
   value
@@ -194,6 +200,12 @@ interface ContentEditorProps {
 
 export function ContentEditor({ workPackageId, initialContent, onContentChange }: ContentEditorProps) {
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
+  const [selectionText, setSelectionText] = useState('')
+  const [aiInstruction, setAiInstruction] = useState('')
+  const [aiErrorMessage, setAiErrorMessage] = useState<string | null>(null)
+  const [isAiProcessing, setIsAiProcessing] = useState(false)
+  const selectionRangeRef = useRef<{ from: number; to: number }>({ from: 0, to: 0 })
+  const previousSelectionRef = useRef<string>('')
   const resolvedContent = useMemo(() => normalizeContent(initialContent || ''), [initialContent])
 
   const editor = useEditor({
@@ -215,6 +227,7 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
       TableRow,
       TableHeader,
       TableCell,
+      AiSelectionHighlight,
     ],
     content: resolvedContent,
     editorProps: {
@@ -231,6 +244,79 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
       debouncedSave(markdown)
     },
   })
+
+  useEffect(() => {
+    if (!editor) {
+      return
+    }
+
+    const handleSelectionUpdate = ({ editor: instance }: { editor: TiptapEditor }) => {
+      const { from, to } = instance.state.selection
+      const isCollapsed = from === to
+      const previousRange = selectionRangeRef.current
+
+      if (isCollapsed) {
+        // Preserve the previous selection highlight when the cursor collapses,
+        // such as when the user clicks into the floating AI input.
+        if (previousRange.to > previousRange.from) {
+          instance.commands.setAiSelectionHighlight(previousRange.from, previousRange.to)
+        } else {
+          setSelectionText('')
+          instance.commands.clearAiSelectionHighlight()
+        }
+        return
+      }
+
+      const text = instance.state.doc.textBetween(from, to, '\n').trim()
+
+      selectionRangeRef.current = { from, to }
+      setSelectionText(text)
+
+      if (text) {
+        instance.commands.setAiSelectionHighlight(from, to)
+      } else {
+        instance.commands.clearAiSelectionHighlight()
+      }
+    }
+
+    editor.on('selectionUpdate', handleSelectionUpdate)
+
+    return () => {
+      editor.off('selectionUpdate', handleSelectionUpdate)
+    }
+  }, [editor])
+
+  useEffect(() => {
+    if (!selectionText) {
+      previousSelectionRef.current = ''
+      setAiInstruction('')
+      setAiErrorMessage(null)
+      selectionRangeRef.current = { from: 0, to: 0 }
+      editor?.commands.clearAiSelectionHighlight()
+      return
+    }
+
+    if (previousSelectionRef.current !== selectionText) {
+      previousSelectionRef.current = selectionText
+      setAiInstruction('')
+      setAiErrorMessage(null)
+    }
+  }, [selectionText, editor])
+
+  const bubbleMenuShouldShow = useCallback(
+    ({ state }: BubbleShouldShowProps) => {
+      if (isAiProcessing) {
+        return true
+      }
+      const { from, to } = state.selection
+      if (from !== to) {
+        return true
+      }
+      const persisted = selectionRangeRef.current
+      return persisted.to > persisted.from
+    },
+    [isAiProcessing]
+  )
 
   const debouncedSave = useMemo(
     () =>
@@ -268,6 +354,89 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
     }
   }, [debouncedSave])
 
+  const handleSelectionInstruction = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!editor) {
+      return
+    }
+
+    const trimmedInstruction = aiInstruction.trim()
+    if (!trimmedInstruction) {
+      setAiErrorMessage('Enter a request for the AI.')
+      return
+    }
+
+    const { from, to } = selectionRangeRef.current
+    if (to <= from) {
+      setAiErrorMessage('Highlight the content you want to change.')
+      return
+    }
+
+    const latestSelected = editor.state.doc.textBetween(from, to, '\n').trim()
+    if (!latestSelected) {
+      setAiErrorMessage('Selected content is empty. Highlight the text again.')
+      return
+    }
+
+    setIsAiProcessing(true)
+    setAiErrorMessage(null)
+
+    try {
+      const fullMarkdown = htmlToMarkdown(editor.getHTML())
+      const response = await fetch(`/api/work-packages/${workPackageId}/selection-edit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instruction: trimmedInstruction,
+          selected_text: latestSelected,
+          full_document: fullMarkdown,
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        if (response.status === 429) {
+          const retrySeconds = (data.retry_after_seconds as number | null) ?? null
+          const friendlyMessage =
+            typeof data.error === 'string'
+              ? data.error
+              : retrySeconds
+              ? `Gemini rate limit reached. Please wait ${retrySeconds} seconds and try again.`
+              : 'Gemini rate limit reached. Please try again shortly.'
+          setAiErrorMessage(friendlyMessage)
+          toast.warning(friendlyMessage)
+          return
+        }
+        throw new Error((data && data.error) || 'Failed to apply AI changes.')
+      }
+
+      const modifiedText = (data.modified_text as string | undefined)?.trim()
+      if (!modifiedText) {
+        throw new Error('AI returned an empty response.')
+      }
+
+      editor
+        .chain()
+        .focus()
+        .setTextSelection({ from, to })
+        .insertContent(modifiedText)
+        .run()
+
+      setAiInstruction('')
+      setSelectionText('')
+      previousSelectionRef.current = ''
+      editor.commands.clearAiSelectionHighlight()
+      toast.success('Selection updated')
+    } catch (error) {
+      console.error('[Selection Edit]', error)
+      const message = error instanceof Error ? error.message : 'Failed to apply AI changes.'
+      setAiErrorMessage(message)
+      toast.error('Failed to update selection')
+    } finally {
+      setIsAiProcessing(false)
+    }
+  }
+
   if (!editor) {
     return null
   }
@@ -285,7 +454,55 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
           {saveStatus === 'error' && <span className="text-red-600 dark:text-red-400">Error</span>}
         </div>
       </div>
-      <div className="flex flex-1 min-h-0 overflow-hidden rounded-lg border bg-background">
+      <div className="relative flex flex-1 min-h-0 overflow-hidden rounded-lg border bg-background">
+        <BubbleMenu
+          editor={editor}
+          shouldShow={bubbleMenuShouldShow}
+          appendTo={() => document.body}
+          options={{
+            placement: 'bottom-start',
+            offset: 20,
+          }}
+          className="pointer-events-auto z-[120] flex justify-center"
+        >
+          <form
+            onSubmit={handleSelectionInstruction}
+            className="w-[520px] max-w-[min(520px,calc(100vw-64px))]"
+          >
+            <div className="flex items-center gap-3 rounded-[24px] border-2 border-[#10B981] bg-white px-5 py-4 shadow-[0_20px_32px_rgba(16,185,129,0.18)] dark:border-[#14A66F] dark:bg-slate-900 dark:shadow-[0_20px_36px_rgba(20,166,111,0.22)]">
+              <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#10B981]/10 text-[#047857] dark:bg-[#14A66F]/20 dark:text-[#6EE7B7]">
+                <PenLine className="size-5" strokeWidth={2} />
+              </span>
+              <input
+                className="flex-1 border-none bg-transparent text-base font-medium leading-relaxed text-foreground outline-none placeholder:text-muted-foreground/70 disabled:opacity-70 dark:text-foreground"
+                placeholder="Find me evidence for this statement"
+                value={aiInstruction}
+                onChange={event => {
+                  setAiInstruction(event.target.value)
+                  if (aiErrorMessage) {
+                    setAiErrorMessage(null)
+                  }
+                }}
+                disabled={isAiProcessing}
+              />
+              <button
+                type="submit"
+                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#10B981] text-white shadow-[0_14px_28px_rgba(16,185,129,0.35)] transition hover:bg-[#0EA371] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none dark:bg-[#14A66F] dark:hover:bg-[#119360]"
+                disabled={isAiProcessing || !aiInstruction.trim()}
+                aria-label="Send instruction to AI"
+              >
+                {isAiProcessing ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <SendHorizontal className="size-5" />
+                )}
+              </button>
+            </div>
+            {aiErrorMessage ? (
+              <p className="mt-2 text-xs font-medium text-red-500">{aiErrorMessage}</p>
+            ) : null}
+          </form>
+        </BubbleMenu>
         <EditorContent editor={editor} className="h-full w-full" />
       </div>
     </div>

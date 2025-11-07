@@ -366,6 +366,17 @@
   background-color: var(--dashboard-bg-gray-50);
 }
 
+/* AI editor selection highlight */
+.dashboard-layout .ai-selection-highlight {
+  background-color: rgba(16, 185, 129, 0.24);
+  border-radius: 4px;
+  transition: background-color 200ms ease;
+}
+
+.dark .dashboard-layout .ai-selection-highlight {
+  background-color: rgba(20, 166, 111, 0.32);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-layout {

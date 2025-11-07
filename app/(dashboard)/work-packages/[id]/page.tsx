@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { TabsContent } from '@/components/ui/tabs'
 import { EditorScreen } from '@/components/workflow-steps/editor-screen'
@@ -74,6 +73,23 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
     }
   }, [workPackageId, loadData])
 
+  useEffect(() => {
+    if (!project) {
+      return
+    }
+
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const detail = { projectName: project.name }
+    window.dispatchEvent(new CustomEvent('tendercreator:set-project-nav', { detail }))
+
+    return () => {
+      window.dispatchEvent(new Event('tendercreator:clear-project-nav'))
+    }
+  }, [project])
+
   const getCompletedSteps = () => {
     const steps: string[] = []
     // Mark strategy complete if win themes OR content exists
@@ -99,35 +115,9 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
     )
   }
 
-  const workPackageStatusCopy: Record<WorkPackage['status'], string> = {
-    pending: 'Not started',
-    in_progress: 'In progress',
-    completed: 'Completed',
-  }
-
   return (
     <div className="flex h-screen w-full flex-1 flex-col overflow-hidden">
-      <div className="mx-auto flex h-full max-w-7xl w-full flex-1 flex-col py-8 px-6">
-        <div className="mb-6 rounded-3xl border bg-card px-6 py-5 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Project</p>
-              <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>
-              <p className="text-sm text-muted-foreground">
-                Currently drafting <span className="font-medium text-foreground">{workPackage.document_type}</span>
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="rounded-full px-4 py-1 text-xs font-semibold">
-                {workPackageStatusCopy[workPackage.status]}
-              </Badge>
-              <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-semibold">
-                {content?.win_themes?.length || 0} win themes
-              </Badge>
-            </div>
-          </div>
-        </div>
-
+      <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col px-8 pb-10 pt-6">
         <WorkflowTabs
         currentTab={currentTab}
         onTabChange={(tab: string) => setCurrentTab(tab as typeof currentTab)}

@@ -36,6 +36,7 @@
     "@tiptap/extension-table-cell": "^3.10.2",
     "@tiptap/extension-table-header": "^3.10.2",
     "@tiptap/extension-table-row": "^3.10.2",
+    "@tiptap/extension-bubble-menu": "^3.10.2",
     "@tiptap/react": "^3.10.2",
     "@tiptap/starter-kit": "^3.10.2",
     "@types/uuid": "^10.0.0",

@@ -96,3 +96,35 @@ ${instruction}
 
 Task: Apply the user's instruction to the selected text. Return the modified text only. No preamble.`
 }
+
+interface SelectionEditPromptArgs {
+  instruction: string
+  selectedText: string
+  fullDocument: string
+  documentType: string
+  projectName: string
+}
+
+export const selectionEditSystemInstruction = `You are TenderCreator's senior bid writer. You specialise in crafting persuasive, evidence-led tender responses that are compliant, concise, and client-focused. Always maintain the voice, terminology, and formatting conventions of professional tender documents. Do not include meta commentary, explanations, or bullet labels in your output—return only the polished passage that should replace the selection.`
+
+export function buildSelectionEditPrompt({
+  instruction,
+  selectedText,
+  fullDocument,
+  documentType,
+  projectName,
+}: SelectionEditPromptArgs): string {
+  return `Tender project: ${projectName}
+Document type: ${documentType}
+
+Full document content (Markdown):
+${fullDocument}
+
+Selected excerpt:
+${selectedText}
+
+User instruction:
+${instruction}
+
+Task: Rewrite the selected excerpt so it follows the instruction while staying consistent with the document's voice, structure, and perspective. Keep commitments accurate, reuse relevant facts that are already present, and introduce additional supporting detail only when it strengthens the tender response. Return only the revised excerpt ready to replace the original selection.`
+}

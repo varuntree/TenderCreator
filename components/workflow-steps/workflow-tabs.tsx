@@ -69,7 +69,7 @@ export function WorkflowTabs({
       onValueChange={onTabChange}
       className={cn('flex w-full flex-col', className)}
     >
-      <div className="mb-8 space-y-3">
+      <div className="mb-6 space-y-3">
         <StepProgressIndicator steps={steps} />
       </div>
 
