@@ -25,7 +25,7 @@ interface WorkPackage {
     source: string
   }>
   assigned_to: string | null
-  status: 'pending' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'review' | 'completed'
 }
 
 interface WorkPackageCardProps {
@@ -97,6 +97,7 @@ export function WorkPackageCard({
               <SelectContent>
                 <SelectItem value="pending">Not Started</SelectItem>
                 <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="review">In Review</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
               </SelectContent>
             </Select>

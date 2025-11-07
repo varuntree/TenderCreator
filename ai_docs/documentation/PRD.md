@@ -256,7 +256,7 @@ type WorkPackage = {
 
   // Assignment (UI only for MVP)
   assigned_to?: string (FK User)
-  status: 'not_started' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'review' | 'completed'
 
   // Order/Priority
   order: number

@@ -203,7 +203,7 @@ export async function generateSingleDocument(workPackageId: string): Promise<voi
  */
 export interface BulkGenerationWorkPackage {
   id: string
-  status: 'pending' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'review' | 'completed'
 }
 
 /**

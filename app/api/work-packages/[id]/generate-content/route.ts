@@ -15,9 +15,15 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const supabase = await createClient()
+  let workPackageId: string | null = null
   try {
     const { id } = await params
-    const supabase = await createClient()
+    workPackageId = id
+    if (!workPackageId) {
+      throw new Error('Work package ID is required')
+    }
+    const activeWorkPackageId = workPackageId
 
     // Verify auth
     const {
@@ -29,15 +35,13 @@ export async function POST(
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const workPackageId = id
-
     // Check if client wants streaming (Accept: text/event-stream)
     const acceptHeader = request.headers.get('accept') || ''
     const wantsStreaming = acceptHeader.includes('text/event-stream')
 
     // Get work package with project and content
-    const { workPackage, project } = await getWorkPackageWithProject(supabase, workPackageId)
-    const existingContent = await getWorkPackageContent(supabase, workPackageId)
+    const { workPackage, project } = await getWorkPackageWithProject(supabase, activeWorkPackageId)
+    const existingContent = await getWorkPackageContent(supabase, activeWorkPackageId)
 
     if (
       !existingContent ||
@@ -53,7 +57,7 @@ export async function POST(
     }
 
     // Update status to in_progress
-    await updateWorkPackageStatus(supabase, workPackageId, 'in_progress')
+    await updateWorkPackageStatus(supabase, activeWorkPackageId, 'in_progress')
 
     // Assemble context
     const context = await assembleProjectContext(supabase, project.id)
@@ -93,7 +97,8 @@ export async function POST(
             }
 
             // Save complete content to database
-            await saveGeneratedContent(supabase, workPackageId, fullContent)
+            await saveGeneratedContent(supabase, activeWorkPackageId, fullContent)
+            await updateWorkPackageStatus(supabase, activeWorkPackageId, 'completed')
 
             // Send done event with full content
             const doneData = JSON.stringify({ fullContent })
@@ -106,6 +111,7 @@ export async function POST(
               error: error instanceof Error ? error.message : 'Streaming failed',
             })
             controller.enqueue(encoder.encode(`event: error\ndata: ${errorData}\n\n`))
+            await updateWorkPackageStatus(supabase, activeWorkPackageId, 'pending')
             controller.close()
           }
         },
@@ -129,11 +135,17 @@ export async function POST(
     )
 
     // Save to database
-    await saveGeneratedContent(supabase, workPackageId, content)
+    await saveGeneratedContent(supabase, activeWorkPackageId, content)
+    await updateWorkPackageStatus(supabase, activeWorkPackageId, 'completed')
 
     return Response.json({ success: true, content })
   } catch (error) {
     console.error('Content generation error:', error)
+    if (workPackageId) {
+      await updateWorkPackageStatus(supabase, workPackageId, 'pending').catch((statusError) => {
+        console.error('Failed to revert status after generation error:', statusError)
+      })
+    }
 
     // Check if this is a rate limit error
     const isRateLimitError = (error as { isRateLimitError?: boolean }).isRateLimitError || false

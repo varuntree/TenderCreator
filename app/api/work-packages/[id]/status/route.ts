@@ -28,13 +28,13 @@ export async function PUT(
     const body = await request.json()
     const { status } = body
 
-    // Validate status
-    const validStatuses = ['not_started', 'in_progress', 'completed']
+    // Validate status (align with DB enum: pending, in_progress, review, completed)
+    const validStatuses = ['pending', 'in_progress', 'review', 'completed']
     if (!status || !validStatuses.includes(status)) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid status. Must be: not_started, in_progress, or completed',
+          error: 'Invalid status. Must be: pending, in_progress, review, or completed',
         },
         { status: 400 }
       )

@@ -21,7 +21,7 @@ interface WorkPackage {
     source: string
   }>
   assigned_to: string | null
-  status: 'pending' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'review' | 'completed'
 }
 
 interface WorkPackageDashboardProps {

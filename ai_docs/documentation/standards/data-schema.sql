@@ -155,7 +155,7 @@ CREATE TABLE work_packages (
 
     -- Assignment (UI only for MVP)
     assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
-    status TEXT NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started', 'in_progress', 'completed')),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'review', 'completed')),
 
     -- Order/Priority
     "order" INTEGER NOT NULL DEFAULT 0,

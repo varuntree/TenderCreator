@@ -310,17 +310,17 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
       if (isAiProcessing) {
         return true
       }
-      if (!selectionText) {
-        return false
-      }
+
       const { from, to } = state.selection
       if (from !== to) {
-        return true
+        const text = state.doc.textBetween(from, to, '\n').trim()
+        return Boolean(text)
       }
+
       const persisted = getAiSelectionRange(state)
       return Boolean(persisted && persisted.to > persisted.from)
     },
-    [isAiProcessing, selectionText]
+    [isAiProcessing]
   )
 
   const bubbleMenuOptions: BubbleMenuPluginProps['options'] | undefined = useMemo(() => {

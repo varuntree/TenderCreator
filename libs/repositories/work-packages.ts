@@ -1,5 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 
+export type WorkPackageStatus = 'pending' | 'in_progress' | 'review' | 'completed'
+
 // TypeScript interfaces
 export interface Requirement {
   id: string
@@ -15,7 +17,7 @@ export interface WorkPackage {
   document_description: string | null
   requirements: Requirement[]
   assigned_to: string | null
-  status: 'pending' | 'in_progress' | 'completed'
+  status: WorkPackageStatus
   order: number
   created_at: string
   updated_at: string
@@ -27,14 +29,14 @@ export interface CreateWorkPackageData {
   document_description?: string | null
   requirements?: Requirement[]
   order?: number
-  status?: 'pending' | 'in_progress' | 'completed'
+  status?: WorkPackageStatus
 }
 
 export interface UpdateWorkPackageData {
   document_type?: string
   document_description?: string | null
   requirements?: Requirement[]
-  status?: 'pending' | 'in_progress' | 'completed'
+  status?: WorkPackageStatus
   assigned_to?: string | null
 }
 
@@ -189,7 +191,7 @@ export async function updateWorkPackageAssignment(
 export async function updateWorkPackageStatus(
   supabase: SupabaseClient,
   workPackageId: string,
-  status: 'not_started' | 'in_progress' | 'completed'
+  status: WorkPackageStatus
 ): Promise<WorkPackage> {
   const { data: workPackage, error } = await supabase
     .from('work_packages')
@@ -255,7 +257,7 @@ export async function listCompletedWorkPackages(
 
 /**
  * Get next incomplete work package for workflow navigation
- * Returns first work package with status='not_started'
+ * Returns first work package with status='pending'
  * Returns null if all complete
  */
 export async function getNextIncompleteWorkPackage(
@@ -266,7 +268,7 @@ export async function getNextIncompleteWorkPackage(
     .from('work_packages')
     .select('*')
     .eq('project_id', projectId)
-    .eq('status', 'not_started')
+    .eq('status', 'pending')
     .order('order', { ascending: true })
     .limit(1)
     .single()

@@ -4,6 +4,7 @@ import { Circle, CircleCheck, CircleDot } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { type DocumentProgress, GenerateDocumentsDialog } from '@/components/generate-documents-dialog'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/loading-spinner'
 import {
@@ -22,7 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { TextShimmer } from '@/components/ui/text-shimmer'
-import { bulkGenerateDocuments } from '@/libs/utils/bulk-generation-v2'
+import { parallelGenerateDocuments } from '@/libs/utils/parallel-generation'
 
 interface WorkPackage {
   id: string
@@ -36,7 +37,7 @@ interface WorkPackage {
     source: string
   }>
   assigned_to: string | null
-  status: 'pending' | 'in_progress' | 'completed'
+  status: 'pending' | 'in_progress' | 'review' | 'completed'
 }
 
 interface WorkPackageTableProps {
@@ -73,11 +74,26 @@ export function WorkPackageTable({
   const [generatingIds, setGeneratingIds] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [messageIndex, setMessageIndex] = useState(0)
-  const [batchProgress, setBatchProgress] = useState<string>('')
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [generationProgress, setGenerationProgress] = useState<Record<string, DocumentProgress>>({})
+  const [dialogError, setDialogError] = useState<string | null>(null)
+  const [currentRunIds, setCurrentRunIds] = useState<string[]>([])
 
   // Calculate pending documents count
   const pendingCount = workPackages.filter(wp => wp.status !== 'completed').length
   const allCompleted = pendingCount === 0
+  const currentRunTotal = currentRunIds.length
+  const completedThisRun = currentRunIds.filter(
+    (id) => generationProgress[id]?.state === 'success'
+  ).length
+  const failedThisRun = currentRunIds.filter(
+    (id) => generationProgress[id]?.state === 'error'
+  ).length
+  const headerMessage = allCompleted
+    ? `All ${workPackages.length} documents completed`
+    : isGenerating && currentRunTotal > 0
+      ? `Generating ${completedThisRun}/${currentRunTotal} documents${failedThisRun ? ` (${failedThisRun} failed)` : ''}`
+      : `${pendingCount} of ${workPackages.length} documents pending`
 
   const getStatusDisplay = (status: string) => {
     switch (status) {
@@ -92,6 +108,12 @@ export function WorkPackageTable({
           icon: CircleDot,
           label: 'In Progress',
           className: 'text-amber-600',
+        }
+      case 'review':
+        return {
+          icon: CircleDot,
+          label: 'In Review',
+          className: 'text-blue-600',
         }
       default:
         return {
@@ -121,94 +143,108 @@ export function WorkPackageTable({
     return user?.name || 'Unassigned'
   }
 
-  const handleGenerateAll = async () => {
-    // Get pending work packages
-    const pendingWorkPackages = workPackages.filter(wp => wp.status !== 'completed')
+  const handleDialogSubmit = async (selectedIds: string[]) => {
+    if (selectedIds.length === 0) return
 
-    if (pendingWorkPackages.length === 0) {
-      toast.info('All documents are already generated')
+    if (workPackages.length === 0) {
+      toast.error('No work packages available')
       return
     }
 
-    // Get project ID from first work package
-    const projectId = pendingWorkPackages[0]?.project_id
+    const projectId = workPackages[0]?.project_id
     if (!projectId) {
       toast.error('No project ID found')
       return
     }
 
-    // Confirm action
-    const confirmed = window.confirm(
-      `Generate all ${pendingWorkPackages.length} pending documents? This may take several minutes.`
-    )
-
-    if (!confirmed) return
-
-    // Set loading state
+    // Close dialog immediately so generation happens in the background
+    setIsDialogOpen(false)
     setIsGenerating(true)
-    setGeneratingIds(pendingWorkPackages.map(wp => wp.id))
+    setDialogError(null)
+    setGeneratingIds(selectedIds)
+    setCurrentRunIds(selectedIds)
+    setGenerationProgress((prev) => {
+      const next = { ...prev }
+      selectedIds.forEach((id) => {
+        next[id] = { state: 'queued' }
+      })
+      return next
+    })
 
-    // Show initial toast
-    toast.info(`Starting generation of ${pendingWorkPackages.length} documents...`)
+    toast.info(`Starting generation for ${selectedIds.length} documents...`)
 
     try {
-      // Call bulk generation with new V2 API
-      const result = await bulkGenerateDocuments(
+      const result = await parallelGenerateDocuments({
         projectId,
-        pendingWorkPackages.map(wp => wp.id),
-        (progress) => {
-          // Update batch progress message
-          const message = progress.phase === 'generating'
-            ? `Batch ${progress.batchNumber}/${progress.totalBatches} - ${progress.completedDocs}/${progress.totalDocs} documents`
-            : progress.message
-
-          setBatchProgress(message)
-
-          // Keep all pending docs as "generating" until complete
-          // (the backend returns which ones are done, but we don't track individually)
-        }
-      )
-
-      // Show results
-      const successMessage = `Generated ${result.succeeded.length} of ${pendingWorkPackages.length} documents successfully`
+        workPackageIds: selectedIds,
+        onProgress: (update) => {
+          setGenerationProgress((prev) => ({
+            ...prev,
+            [update.workPackageId]: {
+              state: update.state,
+              message: update.message,
+            },
+          }))
+        },
+      })
 
       if (result.failed.length > 0) {
-        toast.error(`${successMessage}. ${result.failed.length} failed.`)
-        console.error('[Bulk Generation] Failed documents:', result.failed)
+        setDialogError('Some documents failed to generate. Please review progress and retry the failed items.')
+        toast.error(
+          `Generated ${result.succeeded.length} of ${selectedIds.length} documents. ${result.failed.length} failed.`
+        )
       } else {
-        toast.success(successMessage)
-      }
-
-      // Refresh work packages
-      if (onRefresh) {
-        onRefresh()
+        toast.success(`Generated ${result.succeeded.length} documents successfully.`)
+        setIsDialogOpen(false)
       }
     } catch (error) {
-      console.error('[Bulk Generation] Error:', error)
-      toast.error('Failed to generate documents. Please try again.')
+      const message = error instanceof Error ? error.message : 'Failed to generate documents'
+      setDialogError(message)
+      toast.error(message)
     } finally {
-      // Clear loading state
       setIsGenerating(false)
       setGeneratingIds([])
-      setBatchProgress('')
+      setCurrentRunIds([])
+      if (onRefresh) {
+        await onRefresh()
+      }
     }
   }
 
   return (
     <div className="space-y-4">
+      <GenerateDocumentsDialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open)
+          if (!open) {
+            setDialogError(null)
+          }
+        }}
+        workPackages={workPackages.map((wp) => ({
+          id: wp.id,
+          document_type: wp.document_type,
+          requirementsCount: wp.requirements.length,
+          status: wp.status,
+        }))}
+        isRunning={isGenerating}
+        progress={generationProgress}
+        onSubmit={handleDialogSubmit}
+        errorMessage={dialogError}
+      />
       {/* Generate All Button */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {allCompleted ? (
-            <span>All {workPackages.length} documents completed</span>
-          ) : isGenerating && batchProgress ? (
-            <span className="font-medium text-primary">{batchProgress}</span>
-          ) : (
-            <span>{pendingCount} of {workPackages.length} documents pending</span>
-          )}
+        <div className={`text-sm ${isGenerating ? 'font-medium text-primary' : 'text-muted-foreground'}`}>
+          {headerMessage}
         </div>
         <Button
-          onClick={handleGenerateAll}
+          onClick={() => {
+            if (allCompleted) {
+              toast.info('All documents are already generated')
+              return
+            }
+            setIsDialogOpen(true)
+          }}
           disabled={allCompleted || isGenerating}
           size="lg"
           className="gap-2"
