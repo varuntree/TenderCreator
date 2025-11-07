@@ -21,18 +21,18 @@ const stepOrder: WorkflowStepKey[] = ['strategy', 'edit', 'export']
 
 const stepContent: Record<WorkflowStepKey, { title: string; description: string; order: number }> = {
   strategy: {
-    title: 'Strategy & Planning',
-    description: 'Review requirements, assess bid decision, and develop win strategy.',
+    title: 'Tender Planning',
+    description: 'Review requirements, evaluate bid readiness, and confirm win themes.',
     order: 1,
   },
   edit: {
-    title: 'Editor',
-    description: 'Refine generated content with AI assistance and team feedback.',
+    title: 'Tender Content',
+    description: 'Generate and refine the document content with AI assistance.',
     order: 2,
   },
   export: {
-    title: 'Export',
-    description: 'Download submission-ready files and complete the tender package.',
+    title: 'Tender Export',
+    description: 'Finalize formatting and export submission-ready files.',
     order: 3,
   },
 }

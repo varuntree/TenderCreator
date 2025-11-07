@@ -42,8 +42,15 @@ export default function WorkPackagePage({ params }: WorkPackagePageProps) {
 
       // Load project (from work package)
       const projRes = await fetch(`/api/projects/${wpData.project_id}`)
+      if (!projRes.ok) {
+        throw new Error('Failed to load project')
+      }
       const projData = await projRes.json()
-      setProject(projData)
+      if (projData?.success && projData.data) {
+        setProject(projData.data)
+      } else {
+        throw new Error(projData?.error || 'Failed to load project')
+      }
 
       // Load content (may not exist yet)
       setContentLoaded(false)

@@ -1,5 +1,7 @@
 'use client'
 
+import type { OffsetOptions } from '@floating-ui/dom'
+import type { BubbleMenuPluginProps } from '@tiptap/extension-bubble-menu'
 import CharacterCount from '@tiptap/extension-character-count'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Table } from '@tiptap/extension-table'
@@ -321,13 +323,9 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
     [isAiProcessing, selectionText]
   )
 
-  const bubbleMenuTippyOptions = useMemo(() => {
+  const bubbleMenuOptions: BubbleMenuPluginProps['options'] | undefined = useMemo(() => {
     if (!editor) {
-      return {
-        placement: 'bottom-start' as const,
-        offset: [0, 16] as const,
-        interactive: true,
-      }
+      return undefined
     }
 
     const getReferenceClientRect = () => {
@@ -350,9 +348,11 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
       }
     }
 
+    const offsetOptions: OffsetOptions = { mainAxis: 16, crossAxis: 0 }
+
     return {
-      placement: 'bottom-start' as const,
-      offset: [0, 16] as const,
+      placement: 'bottom-start',
+      offset: offsetOptions,
       interactive: true,
       duration: 0,
       getReferenceClientRect,
@@ -524,7 +524,10 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
       return
     }
 
-    const range = getPersistedRange()
+    const persistedRange = editor ? getAiSelectionRange(editor.state) : null
+    const selectionRange = editor ? editor.state.selection : null
+    const range = persistedRange && persistedRange.to > persistedRange.from ? persistedRange : selectionRange
+
     if (!range || range.to <= range.from) {
       setAiErrorMessage('Highlight the content you want to change.')
       return
@@ -624,7 +627,7 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
           editor={editor}
           shouldShow={bubbleMenuShouldShow}
           appendTo={() => document.body}
-          tippyOptions={bubbleMenuTippyOptions}
+          options={bubbleMenuOptions}
           className="pointer-events-auto z-[120] flex justify-center"
         >
           <form

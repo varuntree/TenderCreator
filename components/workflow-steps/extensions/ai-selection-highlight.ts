@@ -129,6 +129,8 @@ export const AiSelectionHighlight = Extension.create<{ className: string }>({
   },
 })
 
-export const getAiSelectionRange = (state: Parameters<Plugin['props']['decorations']>[0]) => {
+type DecorationsFn = NonNullable<Plugin['props']['decorations']>
+
+export const getAiSelectionRange = (state: Parameters<DecorationsFn>[0]) => {
   return (aiSelectionPluginKey.getState(state) as HighlightRange | null) ?? null
 }
