@@ -58,6 +58,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
+      <h1 className="sr-only">Company</h1>
       {/* Header */}
       <div>
         <div className="mb-2 flex items-center gap-2 text-sm text-gray-500">
@@ -65,11 +66,10 @@ export default function SettingsPage() {
           <span>COMPANY</span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-400 to-green-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--dashboard-primary)]">
             <Building2 className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Company</h1>
             <p className="text-gray-600">
               Manage your company details like name and logo and then build a company profile that Tender Creator can use as context when generating tenders
             </p>
@@ -141,17 +141,17 @@ export default function SettingsPage() {
 
           {/* Profile Card or Create Button */}
           {hasProfile ? (
-            <div className="rounded-lg border-2 border-green-200 bg-gradient-to-br from-green-50 to-green-100 p-6">
+            <div className="rounded-lg border-2 border-[var(--dashboard-primary-light)] bg-[var(--dashboard-primary-light)] p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
-                    <Folder className="h-6 w-6 text-green-600" />
+                    <Folder className="h-6 w-6 text-[var(--dashboard-primary)]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-green-900">
+                    <h3 className="text-xl font-bold text-[var(--dashboard-text-primary)]">
                       {organization.settings.profile?.company_name || organization.name}
                     </h3>
-                    <p className="mt-1 text-sm text-green-700">
+                    <p className="mt-1 text-sm text-[var(--dashboard-primary)]">
                       {organization.settings.profile?.company_description?.substring(0, 120)}
                       {organization.settings.profile?.company_description &&
                         organization.settings.profile.company_description.length > 120 &&
@@ -159,7 +159,7 @@ export default function SettingsPage() {
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {organization.settings.profile?.industry && (
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-green-700">
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-[var(--dashboard-primary)]">
                           {organization.settings.profile.industry}
                         </span>
                       )}
@@ -168,7 +168,7 @@ export default function SettingsPage() {
                         .map((service, idx) => (
                           <span
                             key={idx}
-                            className="rounded-full bg-white px-3 py-1 text-xs font-medium text-green-700"
+                            className="rounded-full bg-white px-3 py-1 text-xs font-medium text-[var(--dashboard-primary)]"
                           >
                             {service}
                           </span>
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                 </div>
                 <Button
                   variant="outline"
-                  className="border-green-600 text-green-700 hover:bg-green-600 hover:text-white"
+                  className="border-[var(--dashboard-primary)] text-[var(--dashboard-primary)] hover:bg-[var(--dashboard-primary)] hover:text-white"
                   onClick={() => setProfileDialogOpen(true)}
                 >
                   <Edit className="mr-2 h-4 w-4" />
@@ -194,7 +194,7 @@ export default function SettingsPage() {
                 Create a company profile to help AI understand your business and generate better tender responses
               </p>
               <Button
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-[var(--dashboard-primary)] hover:bg-[var(--dashboard-primary-hover)]"
                 onClick={() => setProfileDialogOpen(true)}
               >
                 <Sparkles className="mr-2 h-4 w-4" />

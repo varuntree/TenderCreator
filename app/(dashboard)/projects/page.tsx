@@ -35,8 +35,8 @@ export default async function ProjectsPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Projects</h1>
+      <h1 className="sr-only">Projects</h1>
+      <div className="mb-8 flex justify-end">
         <CreateProjectDialog />
       </div>
 

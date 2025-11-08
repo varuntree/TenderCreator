@@ -67,7 +67,7 @@ type ApiResponsePayload<T> = {
   error?: string
 }
 
-const parseApiResponse = async <T>(response: Response, fallbackError: string): Promise<T> => {
+async function parseApiResponse<T>(response: Response, fallbackError: string): Promise<T> {
   const rawBody = await response.text()
   let payload: ApiResponsePayload<T> | null = null
 
@@ -80,7 +80,7 @@ const parseApiResponse = async <T>(response: Response, fallbackError: string): P
   }
 
   if (!response.ok || !payload?.success) {
-    const message = payload?.error ?? rawBody || fallbackError
+    const message = payload?.error ?? (rawBody || fallbackError)
     throw new Error(message)
   }
 

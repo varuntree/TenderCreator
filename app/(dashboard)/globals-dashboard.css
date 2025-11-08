@@ -35,6 +35,7 @@
   /* Status colors */
   --dashboard-success: #10B981;
   --dashboard-warning: #F59E0B;
+  --dashboard-warning-light: rgba(245, 158, 11, 0.1);
   --dashboard-error: #EF4444;
   --dashboard-muted: #6B7280;
 

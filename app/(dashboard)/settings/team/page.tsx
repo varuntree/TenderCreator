@@ -88,22 +88,31 @@ const roleCards = [
   {
     id: 'admin',
     title: 'Admin',
-    badge: 'Creator Role',
+    badge: 'Creator role',
     description: 'Full control over organization settings, billing, and tender workflows.',
-    highlights: ['Billing + subscription control', 'Manage organization profile + documents', 'Invite/remove any team member'],
+    highlights: [
+      'Billing + subscription control',
+      'Manage organization profile + documents',
+      'Invite or remove any team member',
+    ],
   },
   {
     id: 'company_admin',
     title: 'Company Admin',
-    description: 'Operational leaders who manage tenders and project teams day-to-day.',
+    description: 'Operational leaders who run tenders and project teams day-to-day.',
     highlights: ['Create and manage tenders', 'Assign work packages', 'Edit organization profile types'],
   },
   {
     id: 'company_user',
     title: 'Company User',
-    description: 'Subject matter experts and writers contributing to assigned work packages.',
-    highlights: ['Collaborate on assigned documents', 'Upload supporting evidence', 'View company knowledge base'],
+    description: 'Subject matter experts and writers contributing to assigned documents.',
+    highlights: ['Collaborate on assigned docs', 'Upload supporting evidence', 'View company knowledge base'],
   },
+]
+
+const inviteActions = [
+  { label: 'Export roster', variant: 'outline' as const },
+  { label: 'Invite teammate', variant: 'default' as const },
 ]
 
 export default function TeamPage() {
@@ -122,74 +131,97 @@ export default function TeamPage() {
   }, [members, searchQuery, roleFilter])
 
   const handleRoleChange = (memberId: string, nextRole: MemberRole) => {
-    setMembers((prev) => prev.map((member) => (member.id === memberId ? { ...member, role: nextRole } : member)))
+    setMembers((prev) =>
+      prev.map((member) => (member.id === memberId ? { ...member, role: nextRole } : member))
+    )
   }
+
+  const stats = [
+    { label: 'Active seats', value: members.filter((m) => m.status === 'active').length },
+    { label: 'Pending invites', value: members.filter((m) => m.status === 'pending').length },
+    { label: 'Roles in use', value: new Set(members.map((m) => m.role)).size },
+  ]
 
   return (
     <div className="space-y-10">
-      <header className="rounded-2xl border border-[var(--dashboard-border)] bg-white p-8 shadow-sm">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--dashboard-primary-light)] text-[var(--dashboard-primary)]">
-              <Users2 className="h-6 w-6" />
+      <section className="rounded-[32px] border border-slate-200 bg-gradient-to-br from-white via-white to-emerald-50/60 p-8 shadow-[0_25px_80px_rgba(15,23,42,0.08)]">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-1 flex-col gap-4">
+            <div className="inline-flex items-center gap-3 rounded-full border border-emerald-100/70 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-emerald-700">
+              <Users2 className="h-4 w-4 text-emerald-600" />
+              Team
             </div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-[var(--dashboard-text-secondary)]">Team</p>
-              <h1 className="mt-2 text-3xl font-bold text-[var(--dashboard-text-primary)]">Manage your workspace</h1>
-              <p className="mt-2 max-w-2xl text-sm text-[var(--dashboard-text-body)]">
-                Manage your team, invite additional users via email, and assign roles so every proposal has the right owners.
+              <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Manage your workspace</h1>
+              <p className="mt-3 max-w-3xl text-base text-slate-500">
+                Invite collaborators, assign the right permissions, and keep every tender staffed with the exact mix of admins,
+                operators, and contributors.
               </p>
             </div>
+            <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+              {stats.map((stat) => (
+                <div key={stat.label} className="rounded-2xl border border-emerald-100/70 bg-white/80 px-4 py-3">
+                  <dt className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-600">{stat.label}</dt>
+                  <dd className="text-2xl font-semibold text-slate-900">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              variant="outline"
-              className="h-11 rounded-xl border-[var(--dashboard-primary)] px-5 text-sm font-semibold text-[var(--dashboard-primary)] hover:bg-[var(--dashboard-primary-light)]"
-            >
-              Export roster
-            </Button>
-            <Button className="h-11 rounded-xl bg-[var(--dashboard-text-primary)] px-6 text-sm font-semibold text-white shadow-none hover:bg-gray-900">
-              Invite team member
-            </Button>
+          <div className="flex flex-col gap-3 sm:w-60">
+            {inviteActions.map((action) => (
+              <Button
+                key={action.label}
+                variant={action.variant}
+                className={
+                  action.variant === 'outline'
+                    ? 'h-12 rounded-2xl border-emerald-500 text-emerald-700 hover:bg-emerald-50/60'
+                    : 'h-12 rounded-2xl bg-slate-900 text-white hover:bg-slate-800'
+                }
+              >
+                {action.label}
+              </Button>
+            ))}
           </div>
         </div>
-      </header>
+      </section>
 
-      <section className="rounded-2xl border border-[var(--dashboard-border)] bg-white p-8 shadow-sm">
+      <section className="rounded-[32px] border border-slate-200 bg-white/95 p-8 shadow-[0_25px_80px_rgba(15,23,42,0.06)]">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-[var(--dashboard-text-primary)]">Team members</h2>
-            <p className="mt-1 text-sm text-[var(--dashboard-text-secondary)]">Search, filter, and manage access levels for everyone in your workspace.</p>
+            <h2 className="text-3xl font-semibold text-slate-900">Team members</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Search, filter, and manage access levels for everyone in your workspace.
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
-              className="h-10 rounded-xl border border-[var(--dashboard-border-light)] bg-white px-3 text-sm font-medium text-[var(--dashboard-text-primary)] shadow-none hover:bg-[var(--dashboard-bg-gray-100)]"
+              className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 shadow-none hover:bg-slate-50"
             >
-              <Filter className="h-4 w-4 text-[var(--dashboard-text-secondary)]" />
+              <Filter className="h-4 w-4 text-slate-400" />
               Filters
             </Button>
-            <Button className="h-10 rounded-xl bg-[var(--dashboard-primary)] px-4 text-sm font-semibold text-white shadow-none hover:bg-[var(--dashboard-primary-hover)]">
+            <Button className="h-11 rounded-2xl bg-emerald-500 px-5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(16,185,129,0.25)] hover:bg-emerald-500/90">
               Invite
             </Button>
           </div>
         </div>
 
         <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center">
-          <div className="search-input-wrapper w-full lg:max-w-sm">
-            <Search className="search-icon h-4 w-4" />
+          <div className="relative w-full lg:max-w-sm">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               type="text"
               placeholder="Search by name or email"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              className="search-input h-11 rounded-xl border border-[var(--dashboard-border-light)] bg-white text-sm text-[var(--dashboard-text-primary)] placeholder:text-[var(--dashboard-text-muted)] focus-visible:border-[var(--dashboard-primary)] focus-visible:ring-0"
+              className="h-12 rounded-2xl border border-slate-200 bg-white pl-12 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:border-emerald-400 focus-visible:ring-0"
             />
           </div>
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-            <label className="text-xs font-semibold uppercase tracking-wide text-[var(--dashboard-text-secondary)]">Role</label>
+            <label className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-500">Role</label>
             <Select value={roleFilter} onValueChange={(value) => setRoleFilter(value as 'all' | MemberRole)}>
-              <SelectTrigger className="h-11 w-full rounded-xl border border-[var(--dashboard-border-light)] text-sm text-[var(--dashboard-text-primary)] focus-visible:border-[var(--dashboard-primary)] focus-visible:ring-0 sm:w-48">
+              <SelectTrigger className="h-12 w-full rounded-2xl border border-slate-200 text-sm text-slate-700 focus-visible:border-emerald-400 focus-visible:ring-0 sm:w-48">
                 <SelectValue placeholder="All roles" />
               </SelectTrigger>
               <SelectContent>
@@ -202,76 +234,76 @@ export default function TeamPage() {
           </div>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--dashboard-border)]">
-          <table className="min-w-full">
-            <thead>
+        <div className="mt-6 overflow-hidden rounded-[28px] border border-slate-200">
+          <table className="min-w-full border-collapse text-left">
+            <thead className="bg-slate-50/80 text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">
               <tr>
-                <th>Member</th>
-                <th>Joined</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th></th>
+                <th className="px-6 py-4">Member</th>
+                <th className="px-6 py-4">Joined</th>
+                <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 text-sm text-slate-600">
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-sm text-[var(--dashboard-text-secondary)]">
+                  <td colSpan={5} className="py-12 text-center text-sm text-slate-500">
                     No team members match that search. Clear filters to see everyone in your workspace.
                   </td>
                 </tr>
               ) : (
                 filteredMembers.map((member) => (
-                  <tr key={member.id}>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-11 w-11">
-                        <AvatarFallback className="rounded-full bg-[var(--dashboard-primary-light)] text-sm font-semibold text-[var(--dashboard-primary)]">
-                          {getInitials(member.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--dashboard-text-primary)]">{member.name}</p>
-                        <p className="text-sm text-[var(--dashboard-text-secondary)]">{member.email}</p>
+                  <tr key={member.id} className="bg-white/90 hover:bg-slate-50/80">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback className="rounded-2xl bg-emerald-50 text-base font-semibold text-emerald-600">
+                            {getInitials(member.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-base font-semibold text-slate-900">{member.name}</p>
+                          <p className="text-sm text-slate-500">{member.email}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="text-sm text-[var(--dashboard-text-body)]">{member.joined}</td>
-                  <td>
-                    <Select value={member.role} onValueChange={(value) => handleRoleChange(member.id, value as MemberRole)}>
-                      <SelectTrigger className="h-10 w-44 rounded-xl border border-[var(--dashboard-border-light)] text-sm text-[var(--dashboard-text-primary)]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(roleLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td>
-                    <StatusBadge status={member.status} />
-                  </td>
-                  <td className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full text-[var(--dashboard-text-secondary)] hover:bg-[var(--dashboard-bg-gray-100)]">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="rounded-xl border border-[var(--dashboard-border)]">
-                        <DropdownMenuLabel>Quick actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Mail className="mr-2 h-4 w-4" /> Resend invite
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>Update permissions</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Remove from team</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
+                    </td>
+                    <td className="px-6 py-5 text-sm text-slate-500">{member.joined}</td>
+                    <td className="px-6 py-5">
+                      <Select value={member.role} onValueChange={(value) => handleRoleChange(member.id, value as MemberRole)}>
+                        <SelectTrigger className="h-11 w-48 rounded-2xl border border-slate-200 text-sm text-slate-700">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(roleLabels).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-6 py-5">
+                      <StatusBadge status={member.status} />
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-10 w-10 rounded-full text-slate-400 hover:bg-slate-100">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-2xl border border-slate-200 shadow-xl">
+                          <DropdownMenuLabel>Quick actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>
+                            <Mail className="mr-2 h-4 w-4" /> Resend invite
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Update permissions</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">Remove from team</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
                   </tr>
                 ))
               )}
@@ -280,33 +312,37 @@ export default function TeamPage() {
         </div>
       </section>
 
-      <section className="space-y-6 rounded-2xl border border-[var(--dashboard-border)] bg-white p-8 shadow-sm">
+      <section className="space-y-6 rounded-[32px] border border-slate-200 bg-white/95 p-8 shadow-[0_25px_80px_rgba(15,23,42,0.06)]">
         <div>
-          <h2 className="text-2xl font-semibold text-[var(--dashboard-text-primary)]">Organisation roles</h2>
-          <p className="mt-1 text-sm text-[var(--dashboard-text-secondary)]">Snapshot of what each permission tier can do across TenderCreator.</p>
+          <h2 className="text-3xl font-semibold text-slate-900">Organisation roles</h2>
+          <p className="mt-1 text-sm text-slate-500">Snapshot of what each permission tier unlocks across TenderCreator.</p>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
           {roleCards.map((role) => (
-            <article key={role.id} className="flex h-full flex-col rounded-2xl border border-[var(--dashboard-border)] p-6">
-              <div className="flex items-center justify-between">
+            <article
+              key={role.id}
+              className="flex h-full flex-col rounded-[28px] border border-slate-200 bg-gradient-to-b from-white to-slate-50/60 p-6"
+            >
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-[var(--dashboard-text-primary)]">{role.title}</h3>
+                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Role</p>
+                  <h3 className="mt-2 text-xl font-semibold text-slate-900">{role.title}</h3>
                   {role.badge && (
-                    <span className="badge badge-primary mt-2 inline-flex items-center gap-2 bg-[var(--dashboard-primary)] text-[11px] font-semibold uppercase tracking-wide text-white">
-                      <ShieldCheck className="h-3.5 w-3.5" />
+                    <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                      <ShieldCheck className="h-4 w-4" />
                       {role.badge}
                     </span>
                   )}
                 </div>
-                <Badge className="rounded-full bg-[var(--dashboard-bg-gray-100)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--dashboard-text-secondary)]">
+                <Badge className="rounded-full border border-slate-200 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {role.title}
                 </Badge>
               </div>
-              <p className="mt-4 text-sm text-[var(--dashboard-text-body)]">{role.description}</p>
-              <ul className="mt-4 space-y-3 text-sm text-[var(--dashboard-text-primary)]">
+              <p className="mt-4 text-sm text-slate-600">{role.description}</p>
+              <ul className="mt-6 flex flex-col gap-3 text-sm text-slate-700">
                 {role.highlights.map((highlight) => (
-                  <li key={highlight} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[var(--dashboard-primary)]" />
+                  <li key={highlight} className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white/80 px-3 py-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-500" />
                     <span>{highlight}</span>
                   </li>
                 ))}
@@ -321,9 +357,19 @@ export default function TeamPage() {
 
 function StatusBadge({ status }: { status: MemberStatus }) {
   if (status === 'pending') {
-    return <span className="badge badge-muted rounded-full bg-yellow-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-yellow-800">Pending invite</span>
+    return (
+      <span className="inline-flex items-center gap-2 rounded-full border border-amber-100 bg-amber-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-amber-600">
+        <span className="h-2 w-2 rounded-full bg-amber-500" />
+        Pending invite
+      </span>
+    )
   }
-  return <span className="badge badge-green rounded-full bg-[var(--dashboard-primary-light)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--dashboard-primary)]">Active</span>
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600">
+      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+      Active
+    </span>
+  )
 }
 
 function getInitials(name: string) {

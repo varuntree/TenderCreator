@@ -44,7 +44,7 @@ function useSpringProgress({ duration = 8.5, delay = 0 }: { duration?: number; d
   return progress
 }
 
-function useContainerWidth(): [RefObject<HTMLDivElement>, number] {
+function useContainerWidth(): [RefObject<HTMLDivElement | null>, number] {
   const ref = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(320)
 

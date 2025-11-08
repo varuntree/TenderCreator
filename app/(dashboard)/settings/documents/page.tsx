@@ -60,10 +60,10 @@ export default function OrganizationDocumentsPage() {
 
   return (
     <div className="space-y-6">
+      <h1 className="sr-only">Organization Documents</h1>
       <div className="space-y-4">
         <div>
           <p className="text-sm font-semibold text-muted-foreground">COMPANY</p>
-          <h1 className="text-3xl font-bold">Organization Documents</h1>
         </div>
         <CompanySettingsTabs />
       </div>
