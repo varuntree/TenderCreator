@@ -9,7 +9,6 @@ import {
   FileQuestion,
   FolderKanban,
   Plus,
-  Settings,
   Users,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -42,7 +41,7 @@ const navItems: NavItem[] = [
     name: 'Company',
     href: '/settings',
     icon: Building2,
-    match: (pathname) => pathname === '/settings',
+    match: (pathname) => pathname === '/settings' || pathname.startsWith('/settings/documents'),
   },
   {
     id: 'team',
@@ -57,16 +56,6 @@ const navItems: NavItem[] = [
     href: '/settings/billing',
     icon: CreditCard,
     match: (pathname) => pathname === '/settings/billing',
-  },
-  {
-    id: 'settings',
-    name: 'Settings',
-    href: '/settings/documents',
-    icon: Settings,
-    match: (pathname) =>
-      pathname.startsWith('/settings/') &&
-      pathname !== '/settings/team' &&
-      pathname !== '/settings/billing',
   },
   { id: 'resources', name: 'Useful Resources', href: '/resources', icon: BookOpen },
   { id: 'docs', name: 'Documentation', href: '/docs', icon: FileQuestion },

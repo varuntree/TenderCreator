@@ -1,10 +1,11 @@
 'use client'
 
 import { Circle, CircleCheck, CircleDot } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { type DocumentProgress, GenerateDocumentsDialog } from '@/components/generate-documents-dialog'
+import { GenerationAgentsPanel } from '@/components/generation-agents-panel'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/loading-spinner'
 import {
@@ -94,6 +95,42 @@ export function WorkPackageTable({
     : isGenerating && currentRunTotal > 0
       ? `Generating ${completedThisRun}/${currentRunTotal} documents${failedThisRun ? ` (${failedThisRun} failed)` : ''}`
       : `${pendingCount} of ${workPackages.length} documents pending`
+  const detailMessage = isGenerating ? LOADING_MESSAGES[messageIndex] : 'Idle'
+  const workPackageLabels = useMemo(() => {
+    const map = new Map<string, string>()
+    workPackages.forEach((wp) => {
+      map.set(wp.id, wp.document_type)
+    })
+    return map
+  }, [workPackages])
+
+  const agentCards = useMemo(
+    () =>
+      currentRunIds.map((id) => ({
+        id,
+        label: workPackageLabels.get(id) ?? `Document ${id}`,
+        state: generationProgress[id]?.state ?? 'queued',
+      })),
+    [currentRunIds, generationProgress, workPackageLabels]
+  )
+
+  const progressPercent = useMemo(() => {
+    if (!isGenerating || currentRunTotal === 0) return 0
+    const weights: Record<string, number> = {
+      success: 1,
+      error: 1,
+      running: 0.65,
+      queued: 0.35,
+    }
+
+    const aggregate = currentRunIds.reduce((acc, id) => {
+      const state = generationProgress[id]?.state
+      const weight = state ? weights[state] ?? 0 : 0
+      return acc + weight
+    }, 0)
+
+    return Math.min(100, Math.round((aggregate / currentRunTotal) * 100))
+  }, [currentRunIds, currentRunTotal, generationProgress, isGenerating])
 
   const getStatusDisplay = (status: string) => {
     switch (status) {
@@ -132,7 +169,7 @@ export function WorkPackageTable({
 
     const interval = window.setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length)
-    }, 3000)
+    }, 4800)
 
     return () => window.clearInterval(interval)
   }, [isGenerating])
@@ -257,6 +294,19 @@ export function WorkPackageTable({
         </Button>
       </div>
 
+      {isGenerating && currentRunTotal > 0 && (
+        <GenerationAgentsPanel
+          progressPercent={progressPercent}
+          totalDocs={currentRunTotal}
+          completedDocs={completedThisRun}
+          failedDocs={failedThisRun}
+          message={headerMessage}
+          detailMessage={detailMessage}
+          className="animate-in fade-in slide-in-from-bottom-2"
+          agents={agentCards}
+        />
+      )}
+
       {/* Work Packages Table */}
       <div className="rounded-lg border bg-card">
         <Table>
@@ -302,7 +352,7 @@ export function WorkPackageTable({
                     {isDocGenerating ? (
                       <div className="flex items-center gap-2 text-primary">
                         <Spinner size="sm" />
-                        <TextShimmer className="text-sm font-semibold tracking-wide" duration={1.2}>
+                        <TextShimmer className="text-sm font-semibold tracking-wide" duration={2.4}>
                           {LOADING_MESSAGES[messageIndex]}
                         </TextShimmer>
                       </div>

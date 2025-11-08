@@ -1,12 +1,13 @@
 import { NextRequest } from 'next/server'
 
-import { apiError, apiSuccess, AuthContext,withAuth } from '@/libs/api-utils'
+import { apiError, apiSuccess, AuthContext, withAuth } from '@/libs/api-utils'
 import {
   createOrganization,
   deleteOrganization,
   getOrganizationByUserId,
   updateOrganization,
 } from '@/libs/repositories'
+import { isValidUuid } from '@/libs/utils/is-uuid'
 
 async function handleGET(request: NextRequest, { user, supabase }: AuthContext) {
   try {
@@ -15,6 +16,12 @@ async function handleGET(request: NextRequest, { user, supabase }: AuthContext) 
 
     // If no org exists, create one (first sign-in)
     if (!org) {
+      if (!isValidUuid(user.id)) {
+        return apiSuccess({
+          id: 'preview-org',
+          name: 'Preview Organization',
+        })
+      }
       const email = user.email || user.id
       const orgName = `${email.split('@')[0]}'s Organization`
       org = await createOrganization(supabase, orgName, user.id)

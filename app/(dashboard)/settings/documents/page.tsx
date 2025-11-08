@@ -3,6 +3,7 @@
 import { Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { CompanySettingsTabs } from '@/components/company-settings-tabs'
 import DocumentList from '@/components/document-list'
 import { EmptyState } from '@/components/empty-state'
 import FileUpload from '@/components/file-upload'
@@ -58,8 +59,14 @@ export default function OrganizationDocumentsPage() {
   }
 
   return (
-    <div>
-      <h1 className="mb-8 text-3xl font-bold">Organization Documents</h1>
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground">COMPANY</p>
+          <h1 className="text-3xl font-bold">Organization Documents</h1>
+        </div>
+        <CompanySettingsTabs />
+      </div>
 
       <div className="space-y-8">
         <Card>

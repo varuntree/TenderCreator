@@ -39,6 +39,54 @@ interface WorkPackage {
   status: 'pending' | 'in_progress' | 'review' | 'completed'
 }
 
+type ProjectDocument = {
+  id: string
+  name: string
+  file_type: string
+  file_size: number
+  uploaded_at: string
+  is_primary_rft?: boolean
+  download_url?: string | null
+}
+
+type ProjectDetails = {
+  id: string
+  name: string
+  client_name?: string | null
+  start_date?: string | null
+  status?: string | null
+  deadline?: string | null
+  instructions?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+}
+
+type ApiResponsePayload<T> = {
+  success: boolean
+  data: T
+  error?: string
+}
+
+const parseApiResponse = async <T>(response: Response, fallbackError: string): Promise<T> => {
+  const rawBody = await response.text()
+  let payload: ApiResponsePayload<T> | null = null
+
+  if (rawBody) {
+    try {
+      payload = JSON.parse(rawBody) as ApiResponsePayload<T>
+    } catch {
+      payload = null
+    }
+  }
+
+  if (!response.ok || !payload?.success) {
+    const message = payload?.error ?? rawBody || fallbackError
+    throw new Error(message)
+  }
+
+  return payload.data
+}
+
 const statusDisplayMap: Record<string, { label: string; tone: 'preparing' | 'analysis' | 'active' | 'archived' | 'default' }> = {
   setup: { label: 'Preparing', tone: 'preparing' },
   analysis: { label: 'Analyzing', tone: 'analysis' },
@@ -102,39 +150,33 @@ export default function ProjectDetailPage() {
   const params = useParams()
   const projectId = params.id as string
 
-  const [project, setProject] = useState<{
-    id: string
-    name: string
-    client_name?: string | null
-    start_date?: string | null
-    status?: string | null
-    deadline?: string | null
-    instructions?: string | null
-    created_at?: string | null
-    updated_at?: string | null
-  } | null>(null)
-  const [documents, setDocuments] = useState<{id: string; name: string; file_type: string; file_size: number; uploaded_at: string; is_primary_rft?: boolean; download_url?: string | null}[]>([])
+  const [project, setProject] = useState<ProjectDetails | null>(null)
+  const [documents, setDocuments] = useState<ProjectDocument[]>([])
   const [workPackages, setWorkPackages] = useState<WorkPackage[]>([])
   const [loading, setLoading] = useState(true)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [projectRes, docsRes, packagesRes] = await Promise.all([
-        fetch(`/api/projects/${projectId}`),
-        fetch(`/api/projects/${projectId}/documents`),
-        fetch(`/api/projects/${projectId}/work-packages`),
+      const [projectData, docsData, packagesData] = await Promise.all([
+        fetch(`/api/projects/${projectId}`).then(res =>
+          parseApiResponse<ProjectDetails>(res, 'Unable to load project')
+        ),
+        fetch(`/api/projects/${projectId}/documents`).then(res =>
+          parseApiResponse<ProjectDocument[]>(res, 'Unable to load documents')
+        ),
+        fetch(`/api/projects/${projectId}/work-packages`).then(res =>
+          parseApiResponse<WorkPackage[]>(res, 'Unable to load work packages')
+        ),
       ])
 
-      const projectData = await projectRes.json()
-      const docsData = await docsRes.json()
-      const packagesData = await packagesRes.json()
-
-      if (projectData.success) setProject(projectData.data)
-      if (docsData.success) setDocuments(docsData.data)
-      if (packagesData.success) setWorkPackages(packagesData.data || [])
+      setProject(projectData)
+      setDocuments(docsData ?? [])
+      setWorkPackages(packagesData ?? [])
     } catch (error) {
       console.error('Error loading:', error)
+      const message = error instanceof Error ? error.message : 'Failed to load project data'
+      toast.error(message)
     } finally {
       setLoading(false)
     }

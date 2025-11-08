@@ -4,6 +4,7 @@ import { Building2, Edit, Folder, Info, Sparkles, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import CompanyProfileForm from '@/components/company-profile-form'
+import { CompanySettingsTabs } from '@/components/company-settings-tabs'
 import DeleteOrganizationDialog from '@/components/delete-organization-dialog'
 import OrganizationProfileForm from '@/components/organization-profile-form'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -75,6 +76,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      <CompanySettingsTabs />
 
       {/* Company Details Section */}
       <Card>

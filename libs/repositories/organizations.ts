@@ -1,5 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 
+import { isValidUuid } from '@/libs/utils/is-uuid'
+
 export async function getOrganization(supabase: SupabaseClient, orgId: string) {
   const { data, error } = await supabase
     .from('organizations')
@@ -11,7 +13,17 @@ export async function getOrganization(supabase: SupabaseClient, orgId: string) {
   return data
 }
 
-export async function getOrganizationByUserId(supabase: SupabaseClient, userId: string): Promise<{id: string; name: string} | null> {
+export async function getOrganizationByUserId(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{ id: string; name: string } | null> {
+  if (!isValidUuid(userId)) {
+    console.warn(
+      '[organizations] Skipping lookup for non-UUID user id. Running in preview mode?',
+      userId
+    )
+    return null
+  }
   const { data, error } = await supabase
     .from('users')
     .select('organization_id, organizations(*)')
@@ -36,6 +48,9 @@ export async function createOrganization(
   userEmail?: string,
   userName?: string | null
 ) {
+  if (!isValidUuid(userId)) {
+    throw new Error('Cannot create organization for temporary sessions without a valid user id')
+  }
   // Create organization
   const { data: org, error: orgError } = await supabase
     .from('organizations')
