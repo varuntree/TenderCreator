@@ -2,8 +2,8 @@
 
 import { ArrowLeft, FileQuestion, MoreHorizontal, Plus, Zap } from 'lucide-react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { type KeyboardEvent,useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AnalysisTrigger } from '@/components/analysis-trigger'
@@ -22,22 +22,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { WorkPackageDashboard } from '@/components/work-package-dashboard'
+import { getDisplayWorkPackageStatus, type WorkPackage as RepositoryWorkPackage } from '@/libs/repositories/work-packages'
 import { clearBreadcrumbs, setBreadcrumbs } from '@/libs/utils/breadcrumbs'
 
-interface WorkPackage {
-  id: string
-  document_type: string
-  document_description: string | null
-  project_id: string
-  requirements: Array<{
-    id: string
-    text: string
-    priority: 'mandatory' | 'optional'
-    source: string
-  }>
-  assigned_to: string | null
-  status: 'pending' | 'in_progress' | 'review' | 'completed'
-}
+type WorkPackage = RepositoryWorkPackage
 
 type ProjectDocument = {
   id: string
@@ -149,6 +137,7 @@ const KANBAN_COLUMNS = [
 export default function ProjectDetailPage() {
   const params = useParams()
   const projectId = params.id as string
+  const router = useRouter()
 
   const [project, setProject] = useState<ProjectDetails | null>(null)
   const [documents, setDocuments] = useState<ProjectDocument[]>([])
@@ -277,9 +266,18 @@ export default function ProjectDetailPage() {
   const kanbanData = useMemo(() => {
     return KANBAN_COLUMNS.map(column => ({
       ...column,
-      packages: workPackages.filter(pkg => column.statuses.includes(pkg.status)),
+      packages: workPackages.filter((pkg) =>
+        column.statuses.includes(getDisplayWorkPackageStatus(pkg))
+      ),
     }))
   }, [workPackages])
+
+  const handleOpenWorkPackage = useCallback(
+    (workPackageId: string) => {
+      router.push(`/work-packages/${workPackageId}`)
+    },
+    [router]
+  )
 
   if (loading) {
     return (
@@ -491,10 +489,20 @@ export default function ProjectDetailPage() {
                           </div>
                         ) : (
                           column.packages.map(pkg => (
-                            <div
-                              key={pkg.id}
-                              className="rounded-xl border bg-white p-4 shadow-sm transition-all hover:shadow-md"
-                            >
+                              <div
+                                key={pkg.id}
+                                className="rounded-xl border bg-white p-4 shadow-sm transition-all hover:shadow-md cursor-pointer"
+                                role="button"
+                                tabIndex={0}
+                                aria-label={`Open ${pkg.document_type}`}
+                                onClick={() => handleOpenWorkPackage(pkg.id)}
+                                onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+                                  if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault()
+                                    handleOpenWorkPackage(pkg.id)
+                                  }
+                                }}
+                              >
                               <h4 className="text-sm font-semibold text-foreground mb-2">
                                 {pkg.document_type}
                               </h4>

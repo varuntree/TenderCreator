@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { generateBatch } from '@/libs/ai/content-generation'
@@ -6,9 +7,11 @@ import { saveCombinedGeneration } from '@/libs/repositories/work-package-content
 import { getWorkPackage, updateWorkPackageStatus } from '@/libs/repositories/work-packages'
 import { createClient } from '@/libs/supabase/server'
 
-// Use edge runtime for long-running batch operations
-export const runtime = 'edge'
+// Use Node runtime to access the full Node.js API surface (crypto, logging, etc.)
+export const runtime = 'nodejs'
 export const maxDuration = 300 // 5 minutes
+
+const MAX_BATCH_SIZE = 2
 
 /**
  * Generate batch of work packages (2-3 docs per batch) in one request
@@ -22,6 +25,7 @@ export async function POST(
   const supabase = await createClient()
   let requestedWorkPackageIds: string[] = []
   try {
+    const correlationId = randomUUID()
     const { id } = await params
     const projectId = id
     const body = await request.json()
@@ -36,17 +40,17 @@ export async function POST(
       )
     }
 
-    // Limit batch size to prevent token overflow
-    if (workPackageIds.length > 3) {
+    if (workPackageIds.length > MAX_BATCH_SIZE) {
       return NextResponse.json(
         {
-          error: 'Batch size too large. Maximum 3 work packages per batch.',
-          suggestion: 'Split into multiple batches on the client side.',
+          error: `Batch size too large. Select up to ${MAX_BATCH_SIZE} documents per run.`,
+          suggestion: 'Run multiple batches of two documents to stay within the architecture limits.',
         },
         { status: 400 }
       )
     }
 
+    // Limit batch size to prevent token overflow
     // Fetch all work packages
     const workPackages = []
     for (const wpId of workPackageIds) {
@@ -102,12 +106,26 @@ export async function POST(
     }
 
     // Generate batch
-    console.log('[API Batch] Generating', workPackages.length, 'documents')
-    const results = await generateBatch(workPackages, context, instructions)
+    console.log(`[API Batch][${correlationId}] Generating ${workPackages.length} documents`)
+    const { executionMode, items } = await generateBatch(workPackages, context, instructions)
+    console.log(`[API Batch][${correlationId}] Execution mode: ${executionMode}`)
 
     // Save all results to database atomically
     const savedResults = []
-    for (const result of results) {
+    for (const result of items) {
+      if (!result.success || !result.bidAnalysis || !result.winThemes || !result.content) {
+        const failureMessage = result.error || 'Generation failed'
+        await updateWorkPackageStatus(supabase, result.workPackageId, 'pending').catch((error) => {
+          console.error('[API Batch] Failed to revert status after AI failure:', result.workPackageId, error)
+        })
+        savedResults.push({
+          workPackageId: result.workPackageId,
+          success: false,
+          error: failureMessage,
+        })
+        continue
+      }
+
       try {
         // Use atomic save to avoid race conditions
         await saveCombinedGeneration(supabase, result.workPackageId, {
@@ -135,13 +153,15 @@ export async function POST(
       }
     }
 
-    console.log('[API Batch] Batch generation complete')
+    console.log(`[API Batch][${correlationId}] Batch generation complete`)
 
     return NextResponse.json({
       success: true,
+      executionMode,
       results: savedResults,
-      totalGenerated: results.length,
+      totalGenerated: items.filter((item) => item.success).length,
       totalSaved: savedResults.filter((r) => r.success).length,
+      correlationId,
     })
   } catch (error) {
     console.error('[API Batch] Batch generation failed:', error)

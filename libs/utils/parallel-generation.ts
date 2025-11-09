@@ -1,7 +1,10 @@
 import { createSmartBatches } from '@/libs/utils/bulk-generation-v2'
 
+export const MAX_PARALLEL_WORK_PACKAGES = 2
+
 const MAX_RATE_LIMIT_RETRIES = 3
 const DEFAULT_CONCURRENCY = 2
+const DEFAULT_MAX_BATCH_SIZE = MAX_PARALLEL_WORK_PACKAGES
 
 export type ParallelGenerationState = 'queued' | 'running' | 'success' | 'error'
 
@@ -14,6 +17,7 @@ export type ParallelGenerationProgress = {
 export type ParallelGenerationResult = {
   succeeded: string[]
   failed: Array<{ workPackageId: string; error: string }>
+  executionMode?: string
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -56,7 +60,7 @@ export async function parallelGenerateDocuments(options: {
     projectId,
     workPackageIds,
     instructions,
-    maxBatchSize = 3,
+    maxBatchSize = DEFAULT_MAX_BATCH_SIZE,
     concurrency = DEFAULT_CONCURRENCY,
     onProgress,
   } = options
@@ -65,9 +69,23 @@ export async function parallelGenerateDocuments(options: {
     return { succeeded: [], failed: [] }
   }
 
+  if (workPackageIds.length > MAX_PARALLEL_WORK_PACKAGES) {
+    const errorMessage = `Select up to ${MAX_PARALLEL_WORK_PACKAGES} documents per run.`
+    const failed = workPackageIds.map((id) => ({ workPackageId: id, error: errorMessage }))
+    workPackageIds.forEach((id) =>
+      onProgress?.({
+        workPackageId: id,
+        state: 'error',
+        message: errorMessage,
+      })
+    )
+    return { succeeded: [], failed }
+  }
+
   const batches = createSmartBatches(workPackageIds, { maxBatchSize })
   const succeeded: string[] = []
   const failed: Array<{ workPackageId: string; error: string }> = []
+  let executionMode: string | undefined
 
   // Initialize progress as queued
   workPackageIds.forEach((id) =>
@@ -108,7 +126,9 @@ export async function parallelGenerateDocuments(options: {
 
       const data = (await response.json()) as {
         results: Array<{ workPackageId: string; success: boolean; error?: string }>
+        executionMode?: string
       }
+      executionMode = data.executionMode ?? executionMode
 
       data.results.forEach((result) => {
         if (result.success) {
@@ -150,5 +170,5 @@ export async function parallelGenerateDocuments(options: {
   }
 
   await Promise.all(Array.from({ length: safeConcurrency }, () => worker()))
-  return { succeeded, failed }
+  return { succeeded, failed, executionMode }
 }
