@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import { MAX_PARALLEL_WORK_PACKAGES } from '@/libs/utils/parallel-generation'
 
 type WorkPackageStatus = 'pending' | 'in_progress' | 'review' | 'completed'
 type ProgressState = 'idle' | 'queued' | 'running' | 'success' | 'error'
@@ -54,6 +55,7 @@ export function GenerateDocumentsDialog({
     [workPackages]
   )
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const selectionLimit = MAX_PARALLEL_WORK_PACKAGES
 
   // Auto-select all eligible work packages when opening
   useEffect(() => {
@@ -62,8 +64,9 @@ export function GenerateDocumentsDialog({
       return
     }
 
-    setSelected(new Set(selectableWorkPackages.map((wp) => wp.id)))
-  }, [open, selectableWorkPackages])
+    const initialSelection = selectableWorkPackages.slice(0, selectionLimit).map((wp) => wp.id)
+    setSelected(new Set(initialSelection))
+  }, [open, selectableWorkPackages, selectionLimit])
 
   const toggleSelection = (id: string, disabled?: boolean) => {
     if (disabled || isRunning) return
@@ -80,6 +83,7 @@ export function GenerateDocumentsDialog({
 
   const selectedCount = selected.size
   const allDisabled = selectableWorkPackages.length === 0
+  const limitReached = selectedCount >= selectionLimit
 
   const getPrimaryCtaLabel = () => {
     if (selectedCount === 0) {
@@ -127,7 +131,7 @@ export function GenerateDocumentsDialog({
         <DialogHeader className="space-y-2 border-b px-6 py-4 text-left">
           <DialogTitle>Generate documents</DialogTitle>
           <DialogDescription>
-            Select which work packages to generate. We recommend batching 2-3 at a time for
+            Select which work packages to generate. You can run up to {selectionLimit} at a time for
             faster, more reliable output.
           </DialogDescription>
         </DialogHeader>
@@ -148,7 +152,8 @@ export function GenerateDocumentsDialog({
               <div className="space-y-3">
                 {workPackages.map((wp) => {
                   const isCompleted = wp.status === 'completed'
-                  const disabled = isCompleted || isRunning
+                  const disabledByLimit = limitReached && !selected.has(wp.id)
+                  const disabled = isCompleted || isRunning || disabledByLimit
                   const isChecked = !isCompleted && selected.has(wp.id)
                   const progressBadge = renderProgressBadge(wp.id)
 
@@ -186,6 +191,9 @@ export function GenerateDocumentsDialog({
                         <p className="text-xs text-muted-foreground">
                           {wp.requirementsCount} requirement{wp.requirementsCount === 1 ? '' : 's'}
                         </p>
+                        {disabledByLimit && !isCompleted && (
+                          <p className="text-xs font-medium text-amber-600">Limit reached</p>
+                        )}
                       </div>
                     </div>
                   )
@@ -202,6 +210,14 @@ export function GenerateDocumentsDialog({
                 ? 'Select at least one document to generate.'
                 : `${selectedCount} document${selectedCount === 1 ? '' : 's'} selected.`}
             </span>
+            <span className="text-xs text-muted-foreground">
+              Up to {selectionLimit} documents can run per batch. Deselect one to choose another.
+            </span>
+            {limitReached && (
+              <span className="text-xs font-medium text-amber-600">
+                Selection limit reached. Run this batch before choosing more documents.
+              </span>
+            )}
             {isRunning && (
               <span className="text-xs text-muted-foreground">
                 Generation keeps running even if you close this dialog. Reopen anytime to monitor progress.
@@ -214,7 +230,7 @@ export function GenerateDocumentsDialog({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={selectedCount === 0 || isRunning || allDisabled}
+              disabled={selectedCount === 0 || isRunning || allDisabled || selectedCount > selectionLimit}
               className="min-w-[220px]"
             >
               {getPrimaryCtaLabel()}

@@ -12,6 +12,7 @@ import {
   buildCustomPrompt,
   buildSelectionEditPrompt,
   selectionEditSystemInstruction,
+  stripSelectionTokens,
 } from './prompts/editor-actions'
 import { WorkPackage, Requirement } from '@/libs/repositories/work-packages'
 import { ProjectContext } from './context-assembly'
@@ -195,7 +196,7 @@ export async function runSelectionEdit({
     throw error
   }
 
-  const responseText = (response.data as string).trim()
+  const responseText = stripSelectionTokens(response.data as string)
   if (!responseText) {
     throw new Error('AI returned an empty response.')
   }
@@ -291,51 +292,81 @@ export async function generateStrategy(
  * Generate multiple work packages in one batch request
  * Used for bulk generation with client-orchestrated batching
  */
-export async function generateBatch(
-  workPackages: WorkPackage[],
-  context: ProjectContext,
-  instructions?: string
-): Promise<Array<{
+type BatchGenerationMode = 'batch_prompt' | 'fallback_sequential'
+
+export type BatchGenerationItem = {
   workPackageId: string
-  bidAnalysis: BidAnalysis
+  success: boolean
+  bidAnalysis?: BidAnalysis
+  winThemes?: string[]
+  content?: string
+  error?: string
+}
+
+type RawBatchCriterion = {
+  name: string
+  description: string
+  score: number | string
+}
+
+type RawBatchResult = {
+  workPackageId: string
+  bidAnalysis: {
+    criteria: RawBatchCriterion[]
+    recommendation: 'bid' | 'no-bid'
+    reasoning?: string
+    strengths?: string[]
+    concerns?: string[]
+  }
   winThemes: string[]
   content: string
-}>> {
-  const prompt = buildBatchGenerationPrompt(workPackages, context, instructions)
-  console.log('[Batch] Generating', workPackages.length, 'documents in batch')
-  console.log('[Batch] Context size estimate:', context.totalTokensEstimate, 'tokens')
+}
 
-  const response = await executeRequest({
-    prompt,
-    requestType: 'batch-generation',
-    temperature: 0.7,
-    maxRetries: 6, // More retries for batch operations
-  })
+const BATCH_SCHEMA_ERROR = 'INVALID_BATCH_SCHEMA'
 
-  if (!response.success) {
-    const error: any = new Error(response.error || 'Batch generation failed')
-    error.isRateLimitError = response.isRateLimitError
-    error.retryDelaySeconds = response.retryDelaySeconds
-    throw error
+type BatchSchemaError = Error & { code?: typeof BATCH_SCHEMA_ERROR }
+
+const markBatchSchemaError = (message: string): BatchSchemaError => {
+  const error = new Error(message) as BatchSchemaError
+  error.name = BATCH_SCHEMA_ERROR
+  error.code = BATCH_SCHEMA_ERROR
+  return error
+}
+
+function normalizeBatchResults(
+  rawResults: RawBatchResult[] | null,
+  workPackages: WorkPackage[]
+): BatchGenerationItem[] {
+  if (!rawResults || !Array.isArray(rawResults) || rawResults.length === 0) {
+    throw markBatchSchemaError('Batch response missing or empty.')
   }
 
-  const parsed = parseJsonResponse<
-    Array<{
-      workPackageId: string
-      bidAnalysis: any
-      winThemes: string[]
-      content: string
-    }>
-  >(response)
+  const validIds = new Set(workPackages.map((wp) => wp.id))
+  const seenIds = new Set<string>()
 
-  if (!parsed || !Array.isArray(parsed)) {
-    throw new Error('Invalid response structure: expected array of work package results')
-  }
+  const normalized = rawResults.map((result) => {
+    if (!validIds.has(result.workPackageId)) {
+      throw markBatchSchemaError(`Unexpected workPackageId ${result.workPackageId}`)
+    }
+    if (seenIds.has(result.workPackageId)) {
+      throw markBatchSchemaError(`Duplicate entry for workPackageId ${result.workPackageId}`)
+    }
+    seenIds.add(result.workPackageId)
 
-  // Process each bid analysis in the batch
-  const results = parsed.map((result) => {
-    const totalCriteria = result.bidAnalysis.criteria?.length || 1
-    const criteria = result.bidAnalysis.criteria.map((c: any, index: number) => {
+    if (!result.bidAnalysis || !Array.isArray(result.bidAnalysis.criteria) || result.bidAnalysis.criteria.length === 0) {
+      throw markBatchSchemaError('Bid analysis criteria missing in batch response.')
+    }
+
+    if (!Array.isArray(result.winThemes)) {
+      throw markBatchSchemaError('Win themes missing in batch response.')
+    }
+
+    if (typeof result.content !== 'string' || result.content.trim().length === 0) {
+      throw markBatchSchemaError('Content missing in batch response.')
+    }
+
+    const totalCriteria = result.bidAnalysis.criteria.length
+    const criteria = result.bidAnalysis.criteria.map((c, index) => {
       const parsedScore = typeof c.score === 'number' ? c.score : parseFloat(c.score) || 0
       const clampedScore = Math.max(0, Math.min(5, parsedScore))
       const weight = 1 / totalCriteria
@@ -352,7 +383,7 @@ export async function generateBatch(
     })
 
     const totalScore = Math.round(
-      criteria.reduce((sum: number, c: { weightedScore: number }) => sum + c.weightedScore, 0) * 100
+      criteria.reduce((sum, c) => sum + c.weightedScore, 0) * 100
     )
 
     const bidAnalysis: BidAnalysis = {
@@ -366,12 +397,99 @@ export async function generateBatch(
 
     return {
       workPackageId: result.workPackageId,
+      success: true,
       bidAnalysis,
       winThemes: result.winThemes,
       content: result.content,
     }
   })
 
-  console.log('[Batch] Successfully generated', results.length, 'documents')
-  return results
+  if (seenIds.size !== validIds.size) {
+    throw markBatchSchemaError('Batch response missing one or more requested work packages.')
+  }
+
+  return normalized
+}
+
+async function runBatchPrompt(
+  workPackages: WorkPackage[],
+  context: ProjectContext,
+  instructions?: string
+): Promise<BatchGenerationItem[]> {
+  const prompt = buildBatchGenerationPrompt(workPackages, context, instructions)
+  console.log('[Batch] Generating', workPackages.length, 'documents in batch')
+  console.log('[Batch] Context size estimate:', context.totalTokensEstimate, 'tokens')
+
+  const response = await executeRequest({
+    prompt,
+    requestType: 'batch-generation',
+    temperature: 0.7,
+    maxRetries: 6,
+  })
+
+  if (!response.success) {
+    const error: any = new Error(response.error || 'Batch generation failed')
+    error.isRateLimitError = response.isRateLimitError
+    error.retryDelaySeconds = response.retryDelaySeconds
+    throw error
+  }
+
+  const parsed = parseJsonResponse<RawBatchResult[]>(response)
+  return normalizeBatchResults(parsed, workPackages)
+}
+
+async function runFallbackSequential(
+  workPackages: WorkPackage[],
+  context: ProjectContext,
+  instructions?: string
+): Promise<BatchGenerationItem[]> {
+  console.warn('[Batch] Falling back to sequential generation for', workPackages.length, 'documents')
+  const items: BatchGenerationItem[] = []
+  for (const workPackage of workPackages) {
+    try {
+      const { bidAnalysis, winThemes } = await generateStrategy(workPackage, {
+        name: context.project.name,
+        clientName: context.project.client_name,
+        organizationDocs: context.organizationDocs,
+        rftDocs: context.rftDocs,
+      })
+
+      const content = await generateDocumentContent(workPackage, context, winThemes, instructions)
+      items.push({
+        workPackageId: workPackage.id,
+        success: true,
+        bidAnalysis,
+        winThemes,
+        content,
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Fallback generation failed'
+      console.error('[Batch Fallback] Failed for', workPackage.id, message)
+      items.push({
+        workPackageId: workPackage.id,
+        success: false,
+        error: message,
+      })
+    }
+  }
+  return items
+}
+
+export async function generateBatch(
+  workPackages: WorkPackage[],
+  context: ProjectContext,
+  instructions?: string
+): Promise<{ executionMode: BatchGenerationMode; items: BatchGenerationItem[] }> {
+  try {
+    const items = await runBatchPrompt(workPackages, context, instructions)
+    console.log('[Batch] Successfully generated', items.length, 'documents via batch prompt')
+    return { executionMode: 'batch_prompt', items }
+  } catch (error) {
+    const batchError = error as BatchSchemaError & { isRateLimitError?: boolean }
+    if (batchError.code === BATCH_SCHEMA_ERROR) {
+      const fallbackItems = await runFallbackSequential(workPackages, context, instructions)
+      return { executionMode: 'fallback_sequential', items: fallbackItems }
+    }
+    throw error
+  }
 }

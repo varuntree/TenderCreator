@@ -1,0 +1,3 @@
+[2025-11-09 10:00] Started implementation per specs/generate_all_documents_fix/plan.md. Repository already lacks seeded data/Supabase credentials, so batch run reproduction will rely on existing logs + targeted unit tests instead of live API calls.
+[2025-11-09 11:05] Added Gemini batch schema validation + sequential fallback (libs/ai/content-generation.ts) and switched /api/projects/[id]/generate-batch to node runtime with selection cap + structured responses.
+[2025-11-09 11:20] Synced MAX_PARALLEL_WORK_PACKAGES constant across client utilities, enforced dialog selection limits, and enhanced parallel-generation tests/e2e spec.

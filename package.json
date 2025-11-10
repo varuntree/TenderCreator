@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "node -e \"require('fs').mkdirSync('.next/standalone/.next', { recursive: true })\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -53,6 +54,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.542.0",
     "mammoth": "^1.11.0",
+    "marked": "^17.0.0",
     "motion": "^12.23.12",
     "next": "15.5.2",
     "next-mdx-remote": "^5.0.0",
@@ -71,6 +73,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/file-saver": "^2.0.7",

@@ -542,6 +542,9 @@ export function ContentEditor({ workPackageId, initialContent, onContentChange }
       return
     }
 
+    // Re-apply the persisted highlight so the green selection stays visible while Gemini processes.
+    editor.commands.setAiSelectionHighlight(from, to)
+
     setIsAiProcessing(true)
     setAiErrorMessage(null)
 

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { type DocumentProgress, GenerateDocumentsDialog } from '@/components/generate-documents-dialog'
 import { GenerationAgentsPanel } from '@/components/generation-agents-panel'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/loading-spinner'
 import {
@@ -16,6 +17,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import {
   Table,
   TableBody,
   TableCell,
@@ -24,6 +33,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { TextShimmer } from '@/components/ui/text-shimmer'
+import { getDisplayWorkPackageStatus } from '@/libs/repositories/work-packages'
 import { parallelGenerateDocuments } from '@/libs/utils/parallel-generation'
 
 interface WorkPackage {
@@ -39,6 +49,7 @@ interface WorkPackage {
   }>
   assigned_to: string | null
   status: 'pending' | 'in_progress' | 'review' | 'completed'
+  hasGeneratedContent?: boolean
 }
 
 interface WorkPackageTableProps {
@@ -79,9 +90,13 @@ export function WorkPackageTable({
   const [generationProgress, setGenerationProgress] = useState<Record<string, DocumentProgress>>({})
   const [dialogError, setDialogError] = useState<string | null>(null)
   const [currentRunIds, setCurrentRunIds] = useState<string[]>([])
+  const [drawerWorkPackage, setDrawerWorkPackage] = useState<WorkPackage | null>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   // Calculate pending documents count
-  const pendingCount = workPackages.filter(wp => wp.status !== 'completed').length
+  const pendingCount = workPackages.filter(
+    (wp) => getDisplayWorkPackageStatus(wp) !== 'completed'
+  ).length
   const allCompleted = pendingCount === 0
   const currentRunTotal = currentRunIds.length
   const completedThisRun = currentRunIds.filter(
@@ -174,6 +189,14 @@ export function WorkPackageTable({
     return () => window.clearInterval(interval)
   }, [isGenerating])
 
+  useEffect(() => {
+    if (!drawerWorkPackage) return
+    const latest = workPackages.find((wp) => wp.id === drawerWorkPackage.id)
+    if (latest && latest !== drawerWorkPackage) {
+      setDrawerWorkPackage(latest)
+    }
+  }, [drawerWorkPackage, workPackages])
+
   const getUserName = (userId: string | null) => {
     if (!userId || userId === 'unassigned') return 'Unassigned'
     const user = mockUsers.find((u) => u.id === userId)
@@ -194,8 +217,6 @@ export function WorkPackageTable({
       return
     }
 
-    // Close dialog immediately so generation happens in the background
-    setIsDialogOpen(false)
     setIsGenerating(true)
     setDialogError(null)
     setGeneratingIds(selectedIds)
@@ -225,6 +246,10 @@ export function WorkPackageTable({
         },
       })
 
+      if (result.executionMode === 'fallback_sequential') {
+        toast.info('Gemini fallback engaged – documents generated sequentially for reliability.')
+      }
+
       if (result.failed.length > 0) {
         setDialogError('Some documents failed to generate. Please review progress and retry the failed items.')
         toast.error(
@@ -248,6 +273,29 @@ export function WorkPackageTable({
     }
   }
 
+  const openDrawer = (wp: WorkPackage) => {
+    setDrawerWorkPackage(wp)
+    setIsDrawerOpen(true)
+  }
+
+  const closeDrawer = () => {
+    setIsDrawerOpen(false)
+    setDrawerWorkPackage(null)
+  }
+
+  const handleDrawerAssignmentChange = (value: string) => {
+    if (!drawerWorkPackage) return
+    onAssignmentChange(drawerWorkPackage.id, value)
+    setDrawerWorkPackage({
+      ...drawerWorkPackage,
+      assigned_to: value === 'unassigned' ? null : value,
+    })
+  }
+
+  const drawerStatus = drawerWorkPackage
+    ? getStatusDisplay(getDisplayWorkPackageStatus(drawerWorkPackage))
+    : null
+
   return (
     <div className="space-y-4">
       <GenerateDocumentsDialog
@@ -262,7 +310,7 @@ export function WorkPackageTable({
           id: wp.id,
           document_type: wp.document_type,
           requirementsCount: wp.requirements.length,
-          status: wp.status,
+          status: getDisplayWorkPackageStatus(wp),
         }))}
         isRunning={isGenerating}
         progress={generationProgress}
@@ -308,7 +356,7 @@ export function WorkPackageTable({
       )}
 
       {/* Work Packages Table */}
-      <div className="rounded-lg border bg-card">
+      <div className="hidden rounded-lg border bg-card md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -321,7 +369,8 @@ export function WorkPackageTable({
           <TableBody>
             {workPackages.map((wp) => {
               const isDocGenerating = generatingIds.includes(wp.id)
-              const statusDisplay = getStatusDisplay(wp.status)
+              const effectiveStatus = getDisplayWorkPackageStatus(wp)
+              const statusDisplay = getStatusDisplay(effectiveStatus)
               const StatusIcon = statusDisplay.icon
 
               return (
@@ -378,6 +427,152 @@ export function WorkPackageTable({
           </TableBody>
         </Table>
       </div>
+
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden">
+        {workPackages.map((wp) => {
+          const effectiveStatus = getDisplayWorkPackageStatus(wp)
+          const statusDisplay = getStatusDisplay(effectiveStatus)
+          return (
+            <article
+              key={wp.id}
+              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+              data-testid="work-package-row"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-base font-semibold text-slate-900">{wp.document_type}</p>
+                  <p className="text-sm text-muted-foreground">{getUserName(wp.assigned_to)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {wp.requirements.length} requirements tracked
+                  </p>
+                </div>
+                <Badge variant="secondary" className="text-xs font-medium">
+                  {statusDisplay.label}
+                </Badge>
+              </div>
+              {wp.document_description ? (
+                <p className="mt-3 text-sm text-slate-600">{wp.document_description}</p>
+              ) : null}
+              <div className="mt-4 flex flex-col gap-2">
+                <Button size="lg" onClick={() => onOpen(wp.id)}>
+                  Open workspace
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => openDrawer(wp)}
+                  data-testid="work-package-view-details"
+                >
+                  View details
+                </Button>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+
+      <Sheet open={isDrawerOpen} onOpenChange={(open) => (open ? setIsDrawerOpen(true) : closeDrawer())}>
+        <SheetContent
+          side="bottom"
+          className="h-[80vh] rounded-t-[32px] border-none bg-white p-6"
+          data-testid="work-package-drawer"
+        >
+          <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-200" aria-hidden />
+          {drawerWorkPackage ? (
+            <div className="flex h-full flex-col overflow-hidden">
+              <SheetHeader className="text-left">
+                <SheetTitle className="text-2xl text-slate-900">
+                  {drawerWorkPackage.document_type}
+                </SheetTitle>
+                <p className="text-sm text-muted-foreground">
+                  {drawerWorkPackage.document_description || 'No description yet.'}
+                </p>
+              </SheetHeader>
+              <div className="mt-4 flex-1 space-y-5 overflow-y-auto pr-1">
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Assignment
+                  </span>
+                  <Select
+                    value={drawerWorkPackage.assigned_to || 'unassigned'}
+                    onValueChange={handleDrawerAssignmentChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue>
+                        {getUserName(drawerWorkPackage.assigned_to)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
+                      {mockUsers.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Status
+                  </span>
+                  <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                    {drawerStatus ? (
+                      <span className={drawerStatus.className}>{drawerStatus.label}</span>
+                    ) : null}
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Requirements
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {drawerWorkPackage.requirements.length} items
+                    </span>
+                  </div>
+                  <ul className="mt-2 space-y-2">
+                    {drawerWorkPackage.requirements.length === 0 ? (
+                      <li className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-muted-foreground">
+                        No requirements yet
+                      </li>
+                    ) : (
+                      drawerWorkPackage.requirements.map((req) => (
+                        <li key={req.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                          <p className="text-sm text-slate-900">{req.text}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {req.priority} • {req.source}
+                          </p>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              </div>
+              <SheetFooter
+                className="sticky-action-bar mt-6 rounded-t-2xl border-t border-slate-100 bg-white pt-4"
+                data-testid="drawer-action-bar"
+              >
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    onOpen(drawerWorkPackage.id)
+                    closeDrawer()
+                  }}
+                >
+                  Continue in workspace
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline" size="lg">
+                    Close drawer
+                  </Button>
+                </SheetClose>
+              </SheetFooter>
+            </div>
+          ) : null}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

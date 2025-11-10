@@ -88,7 +88,7 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex h-full flex-col border-r border-[var(--dashboard-border)] bg-white transition-all duration-300',
+        'flex h-full flex-col border-r border-[var(--dashboard-border)] bg-white transition-all duration-300 rounded-tr-[40px] rounded-br-[40px]',
         isCollapsed ? 'w-20 px-3 py-4' : 'w-72 px-6 py-6'
       )}
     >

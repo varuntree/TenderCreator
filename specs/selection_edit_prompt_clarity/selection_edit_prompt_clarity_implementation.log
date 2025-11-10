@@ -1,0 +1,4 @@
+[2025-11-09 12:40] Added explicit selection start/end tokens, helper functions, and system prompt guidance so the Gemini request knows which excerpt to rewrite.
+[2025-11-09 12:55] Updated selection edit handler to re-apply the stored highlight during AI execution and cleaned the AI response before reinserting it.
+[2025-11-09 13:05] Added a prompt unit test and documented the selection edit E2E workflow/test case.
+[2025-11-09 13:20] Validation: `npx tsx tests/selection-edit-prompt.test.ts`, `npm run lint`, `npm run build` (blocked earlier by timeout but succeeded after increasing timeout); E2E automation steps documented for future Playwright runs.

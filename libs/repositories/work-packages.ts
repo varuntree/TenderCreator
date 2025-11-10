@@ -21,6 +21,7 @@ export interface WorkPackage {
   order: number
   created_at: string
   updated_at: string
+  hasGeneratedContent?: boolean
 }
 
 export interface CreateWorkPackageData {
@@ -78,7 +79,10 @@ export async function listWorkPackages(
     .from('work_packages')
     .select(`
       *,
-      assigned_user:users!work_packages_assigned_to_fkey(id, email, name)
+      assigned_user:users!work_packages_assigned_to_fkey(id, email, name),
+      work_package_content (
+        content
+      )
     `)
     .eq('project_id', projectId)
     .order('order', { ascending: true })
@@ -88,7 +92,27 @@ export async function listWorkPackages(
     throw new Error(`Failed to list work packages: ${error.message}`)
   }
 
-  return workPackages || []
+  type WorkPackageWithContentRow = WorkPackage & {
+    work_package_content?: Array<{ content?: string | null }>
+  }
+
+  const normalized = (workPackages || []).map((wp) => {
+    const wpWithContent = wp as WorkPackageWithContentRow
+    const contentRecord = Array.isArray(wpWithContent.work_package_content)
+      ? wpWithContent.work_package_content[0]
+      : null
+
+    const trimmedContent = contentRecord?.content?.trim() ?? ''
+    const hasGeneratedContent = trimmedContent.length > 0
+
+    const { work_package_content, ...base } = wpWithContent
+    return {
+      ...base,
+      hasGeneratedContent,
+    }
+  })
+
+  return normalized
 }
 
 /**
@@ -208,6 +232,16 @@ export async function updateWorkPackageStatus(
   }
 
   return workPackage
+}
+
+export function getDisplayWorkPackageStatus(
+  workPackage: Pick<WorkPackage, 'status' | 'hasGeneratedContent'>
+): WorkPackageStatus {
+  if (workPackage.status === 'pending' && workPackage.hasGeneratedContent) {
+    return 'completed'
+  }
+
+  return workPackage.status
 }
 
 /**

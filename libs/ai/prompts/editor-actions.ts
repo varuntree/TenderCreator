@@ -1,5 +1,27 @@
 import { Requirement } from '@/libs/repositories/work-packages'
 
+const SELECTION_START_TOKEN = '<<<AI_SELECTION_START>>>'
+const SELECTION_END_TOKEN = '<<<AI_SELECTION_END>>>'
+
+const normalizePromptValue = (value: string) => value.replace(/\r/g, '')
+
+const wrapWithSelectionTokens = (value: string) =>
+  `${SELECTION_START_TOKEN}\n${value}\n${SELECTION_END_TOKEN}`
+
+export const formatSelectionForPrompt = (value: string) => {
+  const normalized = normalizePromptValue(value)
+  return wrapWithSelectionTokens(normalized)
+}
+
+export const stripSelectionTokens = (value: string) => {
+  return normalizePromptValue(value)
+    .replaceAll(SELECTION_START_TOKEN, '')
+    .replaceAll(SELECTION_END_TOKEN, '')
+    .trim()
+}
+
+export { SELECTION_START_TOKEN, SELECTION_END_TOKEN }
+
 export function buildExpandPrompt(selectedText: string, fullDocument: string, context: string): string {
   return `Selected text to expand:
 "${selectedText}"
@@ -105,7 +127,7 @@ interface SelectionEditPromptArgs {
   projectName: string
 }
 
-export const selectionEditSystemInstruction = `You are TenderCreator's senior bid writer. You specialise in crafting persuasive, evidence-led tender responses that are compliant, concise, and client-focused. Always maintain the voice, terminology, and formatting conventions of professional tender documents. Do not include meta commentary, explanations, or bullet labels in your output—return only the polished passage that should replace the selection.`
+export const selectionEditSystemInstruction = `You are TenderCreator's senior bid writer. You specialise in crafting persuasive, evidence-led tender responses that are compliant, concise, and client-focused. Always maintain the voice, terminology, and formatting conventions of professional tender documents. Do not include meta commentary, explanations, or bullet labels in your output—return only the polished passage that should replace the selection. The selection is wrapped with ${SELECTION_START_TOKEN} and ${SELECTION_END_TOKEN}; do not echo those tokens in your response.`
 
 export function buildSelectionEditPrompt({
   instruction,
@@ -120,11 +142,11 @@ Document type: ${documentType}
 Full document content (Markdown):
 ${fullDocument}
 
-Selected excerpt:
-${selectedText}
+Selected excerpt (rewrite only the text between ${SELECTION_START_TOKEN} and ${SELECTION_END_TOKEN}):
+${formatSelectionForPrompt(selectedText)}
 
 User instruction:
 ${instruction}
 
-Task: Rewrite the selected excerpt so it follows the instruction while staying consistent with the document's voice, structure, and perspective. Keep commitments accurate, reuse relevant facts that are already present, and introduce additional supporting detail only when it strengthens the tender response. Return only the revised excerpt ready to replace the original selection.`
+Task: Rewrite the text that sits between ${SELECTION_START_TOKEN} and ${SELECTION_END_TOKEN} so it follows the instruction while staying consistent with the document's voice, structure, and perspective. Keep commitments accurate, reuse relevant facts that are already present, and introduce additional supporting detail only when it strengthens the tender response. Return only the revised excerpt ready to replace the original selection, and do not include the ${SELECTION_START_TOKEN}/${SELECTION_END_TOKEN} markers in your output.`
 }

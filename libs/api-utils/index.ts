@@ -79,16 +79,15 @@ export function withAuth(handler: AuthHandler) {
         }
       )
 
-      // TEMP DISABLED FOR V7 ITERATION
-      const user = { id: 'temp-user', email: 'temp@example.com' }
-      // const {
-      //   data: { user },
-      //   error,
-      // } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
 
-      // if (error || !user) {
-      //   return apiError('Unauthorized', 401)
-      // }
+      if (error || !user) {
+        console.error('Auth handler unauthorized:', error || 'No user session')
+        return apiError('Unauthorized', 401)
+      }
 
       // Next.js 15: params are now Promise objects, pass context as is
       return handler(request, { user, supabase }, context)

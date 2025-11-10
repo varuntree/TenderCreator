@@ -1,0 +1,3 @@
+- 2025-11-09: Updated libs/api-utils/index.ts so withAuth now fetches the Supabase session and rejects unauthorized requests instead of returning the preview `temp-user` stub.
+- 2025-11-09: Ran `npm run lint` (passes). No automated test suite is defined (`npm run test` is not available).
+- 2025-11-09: Added npm `prebuild` script to create the `.next/standalone/.next` directory so the standalone output process can copy manifests, then reran `npm run build` successfully.

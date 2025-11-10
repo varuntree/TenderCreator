@@ -22,10 +22,10 @@ export default async function DashboardLayout({
   // }
 
   return (
-    <div className="flex h-screen bg-[#f5f7fb]">
+    <div className="flex h-screen">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <main className="flex-1 overflow-hidden bg-[#f5f7fb] px-3 py-3 sm:px-6 sm:py-6">
+        <main className="flex-1 overflow-hidden px-3 py-3 sm:px-6 sm:py-6">
           <section
             className="relative flex h-full w-full flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_40px_120px_rgba(15,23,42,0.14)]"
             style={{ '--dashboard-rail': '5rem', '--dashboard-rail-gap': '1.5rem' } as CSSProperties}
